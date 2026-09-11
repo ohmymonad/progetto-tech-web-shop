@@ -1,0 +1,23 @@
+# scratch / local-only notes, not part of the deliverable
+2ignore/
+
+# env
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+*.swp
+
+# backend (Rails) - populated once backend/ exists
+backend/log/
+backend/tmp/
+backend/.bundle/
+backend/vendor/bundle/
+backend/node_modules/
+
+# frontend (Angular) - populated once frontend/ exists
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
