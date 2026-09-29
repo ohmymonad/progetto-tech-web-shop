@@ -1,0 +1,22 @@
+# Development image: full toolchain, no multi-stage build, code is bind-mounted.
+ARG RUBY_VERSION=3.4.7
+FROM docker.io/library/ruby:$RUBY_VERSION-slim
+
+WORKDIR /app
+
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+      build-essential curl git libjemalloc2 libpq-dev libvips libyaml-dev nodejs pkg-config postgresql-client && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+COPY . .
+
+EXPOSE 3000
+
+# Invoked via bash so the entrypoint script works even when ./backend is bind-mounted
+# over /app at runtime (the host file's executable bit is not guaranteed).
+ENTRYPOINT ["bash", "./bin/docker-entrypoint-dev"]
+CMD ["./bin/rails", "server", "-b", "0.0.0.0"]

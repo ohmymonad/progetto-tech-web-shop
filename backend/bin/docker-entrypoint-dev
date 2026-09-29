@@ -1,0 +1,14 @@
+#!/bin/bash -e
+
+rm -f /app/tmp/pids/server.pid
+
+if [ "$1" = "./bin/rails" ] && [ "$2" = "server" ]; then
+  until pg_isready -h "${POSTGRES_HOST:-db}" -p "${POSTGRES_PORT:-5432}" -U "${POSTGRES_USER:-shop}" -q; do
+    echo "Waiting for database..."
+    sleep 1
+  done
+
+  ./bin/rails db:prepare
+fi
+
+exec "$@"
