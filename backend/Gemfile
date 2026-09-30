@@ -28,6 +28,8 @@ gem "image_processing", "~> 1.2"
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 gem "rack-cors"
+# json 3.x non è compatibile con ActiveSupport 8.1.3 (JSON.parse con 2 argomenti).
+gem "json", "~> 2.9"
 
 # Authentication (JWT) and JSON:API serialization
 gem "devise"
