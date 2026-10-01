@@ -34,5 +34,15 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./pages/checkout').then((m) => m.CheckoutPage),
   },
+  {
+    path: 'orders',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/orders').then((m) => m.OrdersPage),
+  },
+  {
+    path: 'orders/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/order-detail').then((m) => m.OrderDetailPage),
+  },
   { path: '**', loadComponent: () => import('./pages/not-found').then((m) => m.NotFoundPage) },
 ];
