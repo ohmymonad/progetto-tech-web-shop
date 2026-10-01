@@ -5,6 +5,9 @@
       <a routerLink="/products">Prodotti</a> |
       <a routerLink="/cart">Carrello ({{ cart.itemCount() }})</a> |
       <a routerLink="/orders">Ordini</a> |
+      @if (auth.isAdmin()) {
+        <a routerLink="/admin">Admin</a> |
+      }
       <span>{{ user.email }} ({{ user.role }})</span>
       <button type="button" (click)="logout()">Logout</button>
     } @else {

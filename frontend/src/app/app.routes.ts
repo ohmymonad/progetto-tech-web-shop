@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { authGuard, guestGuard } from './core/auth.guards';
+import { adminGuard, authGuard, guestGuard } from './core/auth.guards';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'products' },
@@ -43,6 +43,33 @@ export const routes: Routes = [
     path: 'orders/:id',
     canActivate: [authGuard],
     loadComponent: () => import('./pages/order-detail').then((m) => m.OrderDetailPage),
+  },
+  {
+    path: 'admin',
+    canActivate: [adminGuard],
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'products' },
+      {
+        path: 'products',
+        loadComponent: () => import('./pages/admin/admin-products').then((m) => m.AdminProductsPage),
+      },
+      {
+        path: 'products/new',
+        loadComponent: () => import('./pages/admin/admin-product-form').then((m) => m.AdminProductFormPage),
+      },
+      {
+        path: 'products/:id/edit',
+        loadComponent: () => import('./pages/admin/admin-product-form').then((m) => m.AdminProductFormPage),
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./pages/admin/admin-users').then((m) => m.AdminUsersPage),
+      },
+      {
+        path: 'users/:id',
+        loadComponent: () => import('./pages/admin/admin-user-detail').then((m) => m.AdminUserDetailPage),
+      },
+    ],
   },
   { path: '**', loadComponent: () => import('./pages/not-found').then((m) => m.NotFoundPage) },
 ];
