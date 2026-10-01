@@ -1,5 +1,14 @@
 <header>
   <h1>Shop</h1>
+  <nav aria-label="Navigazione principale">
+    @if (auth.currentUser(); as user) {
+      <span>{{ user.email }} ({{ user.role }})</span>
+      <button type="button" (click)="logout()">Logout</button>
+    } @else {
+      <a routerLink="/login">Login</a>
+    }
+  </nav>
+  <hr />
 </header>
 <main>
   <router-outlet />
