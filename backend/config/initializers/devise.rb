@@ -266,7 +266,8 @@ Devise.setup do |config|
   # should add them to the navigational formats lists.
   #
   # The "*/*" below is required to match Internet Explorer requests.
-  # config.navigational_formats = ['*/*', :html, :turbo_stream]
+  # API pura: nessun redirect, le richieste non autenticate rispondono sempre 401.
+  config.navigational_formats = []
 
   # The default HTTP method used to sign out a resource. Default is :delete.
   config.sign_out_via = :delete
@@ -307,6 +308,20 @@ Devise.setup do |config|
   # Note: These might become the new default in future versions of Devise.
   config.responder.error_status = :unprocessable_content
   config.responder.redirect_status = :see_other
+
+  # JWT: il token viene emesso al login/signup e revocato (denylist) al logout.
+  # Se la chiave dedicata non è nelle credentials si deriva da secret_key_base.
+  config.jwt do |jwt|
+    jwt.secret = Rails.application.credentials.devise_jwt_secret_key || Rails.application.secret_key_base
+    jwt.dispatch_requests = [
+      ["POST", %r{\A/auth/login\z}],
+      ["POST", %r{\A/auth/signup\z}]
+    ]
+    jwt.revocation_requests = [
+      ["DELETE", %r{\A/auth/logout\z}]
+    ]
+    jwt.expiration_time = 1.day.to_i
+  end
 
   # ==> Configuration for :registerable
 
