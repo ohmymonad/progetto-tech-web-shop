@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { guestGuard } from './core/auth.guards';
+import { authGuard, guestGuard } from './core/auth.guards';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'products' },
@@ -13,6 +13,16 @@ export const routes: Routes = [
     path: 'signup',
     canActivate: [guestGuard],
     loadComponent: () => import('./pages/signup').then((m) => m.SignupPage),
+  },
+  {
+    path: 'products',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/products').then((m) => m.ProductsPage),
+  },
+  {
+    path: 'products/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/product-detail').then((m) => m.ProductDetailPage),
   },
   { path: '**', loadComponent: () => import('./pages/not-found').then((m) => m.NotFoundPage) },
 ];
