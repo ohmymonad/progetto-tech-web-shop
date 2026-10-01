@@ -5,10 +5,11 @@ import { RouterLink } from '@angular/router';
 import { errorMessage } from '../core/http-error';
 import { Product } from '../core/models';
 import { ProductService } from '../services/product.service';
+import { AddToCartButton } from './add-to-cart';
 
 @Component({
   selector: 'app-product-detail',
-  imports: [RouterLink, CurrencyPipe],
+  imports: [RouterLink, CurrencyPipe, AddToCartButton],
   template: `
     <p><a routerLink="/products">← Tutti i prodotti</a></p>
     @if (loading()) {
@@ -23,6 +24,7 @@ import { ProductService } from '../services/product.service';
         <dt>Prezzo</dt><dd>{{ p.price | currency: 'EUR' }}</dd>
         <dt>Disponibilità</dt><dd>{{ p.stock }}</dd>
       </dl>
+      <app-add-to-cart [productId]="p.id" [disabled]="p.stock === 0 || !p.active" />
     }
   `,
 })

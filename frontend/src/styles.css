@@ -4,3 +4,4 @@ table { border-collapse: collapse; }
 th, td { border: 1px solid #999; padding: 0.25rem 0.5rem; text-align: left; }
 .error { color: #b00020; }
 .success { color: #006400; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

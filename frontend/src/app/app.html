@@ -3,6 +3,7 @@
   <nav aria-label="Navigazione principale">
     @if (auth.currentUser(); as user) {
       <a routerLink="/products">Prodotti</a> |
+      <a routerLink="/cart">Carrello ({{ cart.itemCount() }})</a> |
       <span>{{ user.email }} ({{ user.role }})</span>
       <button type="button" (click)="logout()">Logout</button>
     } @else {

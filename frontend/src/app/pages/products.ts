@@ -6,10 +6,11 @@ import { RouterLink } from '@angular/router';
 import { errorMessage } from '../core/http-error';
 import { PageMeta, Product } from '../core/models';
 import { ProductService } from '../services/product.service';
+import { AddToCartButton } from './add-to-cart';
 
 @Component({
   selector: 'app-products',
-  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe],
+  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, AddToCartButton],
   template: `
     <h2>Prodotti</h2>
 
@@ -38,7 +39,7 @@ import { ProductService } from '../services/product.service';
       } @else {
         <table>
           <thead>
-            <tr><th>Nome</th><th>Categoria</th><th>Prezzo</th><th>Disponibilità</th></tr>
+            <tr><th>Nome</th><th>Categoria</th><th>Prezzo</th><th>Disponibilità</th><th></th></tr>
           </thead>
           <tbody>
             @for (product of products(); track product.id) {
@@ -47,6 +48,7 @@ import { ProductService } from '../services/product.service';
                 <td>{{ product.category }}</td>
                 <td>{{ product.price | currency: 'EUR' }}</td>
                 <td>{{ product.stock }}</td>
+                <td><app-add-to-cart [productId]="product.id" [disabled]="product.stock === 0" /></td>
               </tr>
             }
           </tbody>
