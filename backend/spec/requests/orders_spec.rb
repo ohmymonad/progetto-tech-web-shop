@@ -40,6 +40,32 @@ RSpec.describe "Ordini", type: :request do
         expect(response).to have_http_status(:unprocessable_content)
         expect(user.reload.cart.cart_items.count).to eq(1)
         expect(Order.count).to eq(0)
+        expect(product.reload.stock).to eq(5)
+      end
+
+      it "scala dal magazzino le quantità ordinate" do
+        expect { post "/orders", params: { order: customer }, headers: headers, as: :json }
+          .to change { product.reload.stock }.from(5).to(2)
+      end
+    end
+
+    context "con disponibilità insufficiente" do
+      let(:available) { create(:product, name: "Mouse", stock: 5) }
+      let(:scarce) { create(:product, name: "Tastiera", stock: 1) }
+      before do
+        cart = create(:cart, user: user)
+        create(:cart_item, cart: cart, product: available, quantity: 2, unit_price: 10)
+        create(:cart_item, cart: cart, product: scarce, quantity: 2, unit_price: 10)
+      end
+
+      it "risponde 422 indicando il prodotto e non modifica nulla" do
+        post "/orders", params: { order: customer }, headers: headers, as: :json
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(json["error"]).to include("Tastiera")
+        expect(Order.count).to eq(0)
+        expect(available.reload.stock).to eq(5)
+        expect(scarce.reload.stock).to eq(1)
+        expect(user.reload.cart.cart_items.count).to eq(2)
       end
     end
 

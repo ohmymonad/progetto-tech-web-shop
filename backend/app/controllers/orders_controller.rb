@@ -11,17 +11,21 @@ class OrdersController < ApplicationController
     render json: { order: OrderSerializer.call(order) }
   end
 
-  # Trasforma il carrello in ordine: prezzi congelati, totale calcolato, carrello svuotato.
+  # Trasforma il carrello in ordine: stock scalato, prezzi congelati, totale calcolato, carrello svuotato.
+  # Qualsiasi errore annulla l'intera transazione, stock compreso.
   def create
     cart = current_cart
     raise InvalidRequest, "Il carrello è vuoto" if cart.cart_items.empty?
 
     order = nil
     ActiveRecord::Base.transaction do
+      items = cart.cart_items.to_a
+      products = withdraw_stock!(items)
+
       order = current_user.orders.build(customer_params)
       order.total = cart.total
-      cart.cart_items.includes(:product).each do |item|
-        order.order_items.build(product: item.product, quantity: item.quantity, unit_price: item.unit_price)
+      items.each do |item|
+        order.order_items.build(product: products[item.product_id], quantity: item.quantity, unit_price: item.unit_price)
       end
       order.save!
       cart.cart_items.destroy_all
@@ -31,6 +35,22 @@ class OrdersController < ApplicationController
   end
 
   private
+
+  # Blocca le righe dei prodotti (SELECT ... FOR UPDATE, in ordine di id per evitare deadlock):
+  # due checkout concorrenti non possono vendere la stessa disponibilità.
+  def withdraw_stock!(items)
+    products = Product.where(id: items.map(&:product_id)).order(:id).lock.index_by(&:id)
+    items.each do |item|
+      product = products.fetch(item.product_id)
+      if product.stock < item.quantity
+        raise InvalidRequest,
+              "Disponibilità insufficiente per #{product.name}: richiesti #{item.quantity}, disponibili #{product.stock}"
+      end
+
+      product.update!(stock: product.stock - item.quantity)
+    end
+    products
+  end
 
   def customer_params
     params.require(:order).permit(:full_name, :email, :address, :city, :postal_code)
