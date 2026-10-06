@@ -83,7 +83,31 @@ Nessun segreto è scritto in chiaro in `.env` o nel codice. I segreti stanno in
 
 ## Avvio rapido con Docker Compose
 
-_In preparazione._
+```bash
+docker compose up --build
+```
+
+Al primo avvio Compose costruisce le immagini, installa gem e pacchetti npm (conservati in volumi
+dedicati) e avvia i tre servizi:
+
+| Servizio | URL sull'host | Note |
+| --- | --- | --- |
+| `frontend` | <http://localhost:4200> | `ng serve` con ricarica automatica (`--poll 2000`) |
+| `backend` | <http://localhost:3000> | Rails/Puma; `GET /up` è l'health check |
+| `db` | `localhost:5433` | PostgreSQL 16 (porta 5433 per non scontrarsi con un Postgres locale) |
+
+L'entrypoint del backend (`backend/bin/docker-entrypoint-dev`) aspetta che il database sia pronto
+e lancia `bin/rails db:prepare`: al primo avvio crea il database, esegue le migrazioni e carica i
+dati di esempio; agli avvii successivi applica solo le migrazioni nuove. Non serve quindi nessun
+passo manuale per arrivare a un'applicazione funzionante.
+
+Il codice di `backend/` e `frontend/` è montato nei container: le modifiche si vedono senza
+ricostruire le immagini (serve `--build` solo se cambiano `Gemfile` o `package.json`).
+
+```bash
+docker compose down      # ferma i servizi, i dati restano nel volume pgdata
+docker compose down -v   # ferma i servizi e cancella anche database e dipendenze installate
+```
 
 ## Database: migrazioni e seed
 
