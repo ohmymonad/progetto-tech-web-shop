@@ -31,7 +31,25 @@ modalità API, frontend Angular 21, database PostgreSQL, il tutto avviabile con 
 
 ## Prerequisiti
 
-_In preparazione._
+**Percorso consigliato (Docker):** basta Docker con il plugin Compose v2. Ruby, Node e PostgreSQL
+girano nei container.
+
+| Software | Versione verificata | Dove |
+| --- | --- | --- |
+| Docker Engine | 29.8 | host |
+| Docker Compose | v2.40 | host |
+| Ruby | 3.4.7 | immagine `ruby:3.4.7-slim` (`backend/.ruby-version`) |
+| Rails | 8.1.3 | `backend/Gemfile.lock` |
+| PostgreSQL | 16.14 | immagine `postgres:16-alpine` |
+| Node.js | 22.23 (npm 10.9) | immagine `node:22-alpine` |
+| Angular CLI | 21.2 | installata nell'immagine del frontend |
+
+Gem principali: `devise` 5.0.4, `devise-jwt` 0.13.0, `rack-cors` 3.0.0, `rspec-rails` 8.0.4.
+Pacchetti principali: `@angular/core` 21.2, `typescript` 5.9, `vitest` 4.1.
+
+**Percorso nativo (senza Docker):** servono le stesse versioni installate sulla macchina
+(Ruby 3.4.7 con Bundler, Node.js 22 con npm, PostgreSQL 16, Angular CLI 21 opzionale perché si
+può usare `npx ng`) e le librerie di sviluppo di PostgreSQL (`libpq-dev`) per compilare la gem `pg`.
 
 ## Configurazione
 
