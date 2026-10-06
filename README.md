@@ -53,7 +53,33 @@ può usare `npx ng`) e le librerie di sviluppo di PostgreSQL (`libpq-dev`) per c
 
 ## Configurazione
 
-_In preparazione._
+### Variabili d'ambiente
+
+```bash
+cp .env.example .env
+```
+
+`.env` è letto da Docker Compose ed è ignorato da git. Tutte le variabili hanno un valore di
+default in `docker-compose.yml`, quindi il file è facoltativo: serve solo per cambiare i valori.
+
+| Variabile | Default | Uso |
+| --- | --- | --- |
+| `POSTGRES_USER` / `POSTGRES_PASSWORD` | `shop` / `shop_password` | utente del database |
+| `POSTGRES_DB` | `shop_development` | database di sviluppo |
+| `POSTGRES_HOST` / `POSTGRES_PORT` | `db` / `5432` | dove il backend trova Postgres (`localhost` fuori da Docker) |
+
+### Segreti: encrypted credentials di Rails
+
+Nessun segreto è scritto in chiaro in `.env` o nel codice. I segreti stanno in
+`backend/config/credentials.yml.enc`, che è cifrato e committato; la chiave per decifrarlo è
+`backend/config/master.key`, che **non** è committata.
+
+- **Sviluppo e test:** `master.key` non serve. Rails genera da solo una chiave locale
+  (`backend/tmp/local_secret.txt`) e la usa per firmare i JWT.
+- **Produzione:** serve `master.key` (oppure la variabile `RAILS_MASTER_KEY`), perché il segreto
+  dei JWT è il `secret_key_base` delle credentials. Si può impostare un segreto dedicato
+  aggiungendo la chiave `devise_jwt_secret_key` con `bin/rails credentials:edit` (richiede
+  `master.key` e un editor nella variabile `EDITOR`); `config/initializers/devise.rb` la usa se presente.
 
 ## Avvio rapido con Docker Compose
 
