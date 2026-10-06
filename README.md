@@ -111,7 +111,24 @@ docker compose down -v   # ferma i servizi e cancella anche database e dipendenz
 
 ## Database: migrazioni e seed
 
-_In preparazione._
+Con Docker i comandi si eseguono nel container del backend:
+
+```bash
+docker compose run --rm backend bin/rails db:create    # crea il database (se non esiste)
+docker compose run --rm backend bin/rails db:migrate   # applica le migrazioni
+docker compose run --rm backend bin/rails db:seed      # carica i dati di esempio
+docker compose run --rm backend bin/rails db:reset     # ricrea il database da zero e rilancia il seed
+```
+
+Senza Docker sono gli stessi comandi lanciati dalla cartella `backend/` (`bin/rails db:migrate`, ...).
+
+Il seed (`backend/db/seeds.rb`) è idempotente, quindi si può rilanciare senza creare duplicati, e carica:
+
+- **20 prodotti** in 5 categorie (Elettronica, Casa, Sport, Libri, Abbigliamento), tutti attivi e
+  con disponibilità a magazzino;
+- **2 utenti**, un amministratore e un cliente: vedi [Utenti di test](#utenti-di-test).
+
+Lo schema risultante è in `backend/db/schema.rb`.
 
 ## Avvio nativo del backend
 
