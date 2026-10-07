@@ -247,4 +247,18 @@ Codici di stato usati: `401` token assente, scaduto o revocato (o credenziali er
 
 ## Problemi noti
 
-_In preparazione._
+- **Le modifiche al frontend non si vedono nel browser (Linux, Docker).** Sui bind mount il file
+  watcher non riceve gli eventi del filesystem: per questo il container avvia `ng serve --poll 2000`.
+  Se si avvia `ng serve` a mano dentro il container, va aggiunto `--poll`.
+- **Errore CORS nella console del browser.** Il backend accetta solo le origini `localhost:4200` e
+  `127.0.0.1:4200`; servire il frontend su un'altra porta o un altro host richiede di aggiornare
+  `backend/config/initializers/cors.rb`. Lo stesso file espone l'header `Authorization`: senza
+  quella riga il browser lo nasconde e il frontend non riceve il JWT.
+- **`port is already allocated` all'avvio.** Le porte 3000, 4200 o 5433 sono già occupate da un
+  altro processo: va fermato oppure va cambiata la porta sull'host in `docker-compose.yml`.
+- **`A server is already running` dal backend.** Il file `backend/tmp/pids/server.pid` è rimasto da
+  un arresto brusco; l'entrypoint lo cancella a ogni avvio, fuori da Docker va rimosso a mano.
+- **Dopo un logout il vecchio token non funziona più.** È voluto: il logout aggiunge il token alla
+  denylist (tabella `jwt_denylists`). I token scadono comunque dopo 24 ore.
+- **File di `dist/` o `node_modules/` di proprietà di root.** Succede eseguendo i comandi con
+  `docker compose run` come root; si evita aggiungendo `-u "$(id -u):$(id -g)"` al comando.
