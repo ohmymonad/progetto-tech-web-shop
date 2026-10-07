@@ -154,7 +154,18 @@ si chiama `backend_test`.
 
 ## Frontend in sviluppo
 
-_In preparazione._
+Con Docker il server di sviluppo parte già con `docker compose up`. Senza Docker:
+
+```bash
+cd frontend
+npm ci
+npm start              # equivale a: npx ng serve → http://localhost:4200
+```
+
+L'app chiama il backend su `http://localhost:3000`. L'indirizzo è definito dal token `API_URL`
+in `frontend/src/app/core/api.config.ts`: per puntare a un altro backend si cambia il valore
+lì. Il backend accetta richieste cross-origin solo da `localhost:4200` e `127.0.0.1:4200`
+(`backend/config/initializers/cors.rb`), quindi il frontend va servito su quella porta.
 
 ## Build di produzione del frontend
 
