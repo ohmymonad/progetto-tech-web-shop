@@ -169,7 +169,22 @@ lì. Il backend accetta richieste cross-origin solo da `localhost:4200` e `127.0
 
 ## Build di produzione del frontend
 
-_In preparazione._
+```bash
+# con Docker (il servizio frontend in esecuzione va prima fermato, perché usa la porta 4200)
+docker compose stop frontend
+docker compose run --rm --no-deps frontend npx ng build
+docker compose run --rm --no-deps -p 4200:4200 frontend npx --yes serve -s dist/frontend/browser -l 4200
+
+# senza Docker, dalla cartella frontend/
+npx ng build
+npx --yes serve -s dist/frontend/browser -l 4200
+```
+
+`ng build` usa di default la configurazione `production` (minificazione, hashing dei file, budget
+sulle dimensioni) e scrive i file statici in `frontend/dist/frontend/browser/`. Qualsiasi server
+statico va bene, purché rimandi a `index.html` le rotte che non corrispondono a un file, così che
+un link diretto come `/orders/1` arrivi al router di Angular: è ciò che fa l'opzione `-s` di
+`serve`. Il backend deve essere attivo su `localhost:3000`.
 
 ## Utenti di test
 
