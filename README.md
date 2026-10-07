@@ -200,7 +200,18 @@ assegnabile dal frontend né dall'API pubblica.
 
 ## Test
 
-_In preparazione._
+```bash
+# backend: RSpec (model + request spec), usa il database backend_test
+docker compose run --rm backend bundle exec rspec
+
+# frontend: Vitest tramite il builder unit-test di Angular
+docker compose run --rm --no-deps frontend npx ng test --watch=false
+```
+
+Senza Docker: `bundle exec rspec` da `backend/` (con le variabili `POSTGRES_*` della sezione
+[Avvio nativo del backend](#avvio-nativo-del-backend)) e `npx ng test --watch=false` da `frontend/`.
+
+Allo stato attuale passano 100 esempi RSpec e 26 test del frontend.
 
 ## API
 
