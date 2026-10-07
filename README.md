@@ -132,7 +132,25 @@ Lo schema risultante è in `backend/db/schema.rb`.
 
 ## Avvio nativo del backend
 
-_In preparazione._
+Alternativa a Docker per il solo backend (il percorso verificato resta quello con Compose).
+Serve un PostgreSQL raggiungibile: va bene uno installato localmente oppure solo il servizio `db`
+di Compose (`docker compose up -d db`, esposto sulla porta **5433**).
+
+```bash
+cd backend
+bundle install
+
+# con il Postgres di Compose; per un Postgres locale ometti POSTGRES_PORT (default 5432)
+export POSTGRES_HOST=localhost POSTGRES_PORT=5433
+export POSTGRES_USER=shop POSTGRES_PASSWORD=shop_password
+
+bin/rails db:prepare   # crea, migra e (alla creazione) popola il database
+bin/rails server       # http://localhost:3000
+```
+
+`backend/config/database.yml` legge le variabili `POSTGRES_*` con gli stessi default di
+`.env.example`, tranne `POSTGRES_HOST` che fuori da Docker vale `localhost`. Il database dei test
+si chiama `backend_test`.
 
 ## Frontend in sviluppo
 
