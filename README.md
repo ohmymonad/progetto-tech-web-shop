@@ -188,7 +188,15 @@ un link diretto come `/orders/1` arrivi al router di Angular: è ciò che fa l'o
 
 ## Utenti di test
 
-_In preparazione._
+Creati dal seed (vedi [Database: migrazioni e seed](#database-migrazioni-e-seed)):
+
+| Ruolo | Email | Password | Cosa può fare |
+| --- | --- | --- | --- |
+| Amministratore | `admin@example.com` | `password123` | tutto ciò che fa un cliente, più l'area `/admin` (prodotti e utenti) |
+| Cliente | `user@example.com` | `password123` | catalogo, carrello, checkout, storico ordini |
+
+Dalla pagina di registrazione si possono creare altri clienti; il ruolo di amministratore non è
+assegnabile dal frontend né dall'API pubblica.
 
 ## Test
 
