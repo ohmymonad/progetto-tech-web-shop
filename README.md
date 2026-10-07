@@ -215,7 +215,35 @@ Allo stato attuale passano 100 esempi RSpec e 26 test del frontend.
 
 ## API
 
-_In preparazione._
+Tutte le risposte sono JSON. Salvo dove indicato, ogni endpoint richiede l'header
+`Authorization: Bearer <jwt>`; il token viene restituito nello stesso header dalle risposte di login
+e signup. Gli errori hanno sempre la forma `{ "error": "messaggio" }`.
+
+| Metodo | Percorso | Accesso | Descrizione |
+| --- | --- | --- | --- |
+| `POST` | `/auth/signup` | pubblico | registrazione `{ user: { email, password } }`, restituisce il JWT |
+| `POST` | `/auth/login` | pubblico | login `{ user: { email, password } }`, restituisce il JWT |
+| `DELETE` | `/auth/logout` | utente | revoca il token corrente |
+| `GET` | `/auth/me` | utente | utente autenticato |
+| `GET` | `/products` | utente | prodotti attivi; filtri `category`, `q`, paginazione `page`, `per_page` (max 100) |
+| `GET` | `/products/:id` | utente | dettaglio prodotto |
+| `GET` | `/cart` | utente | carrello dell'utente (creato al primo accesso) |
+| `POST` | `/cart/items` | utente | aggiunge `{ product_id, quantity }`; se il prodotto c'è già somma la quantità |
+| `PATCH` | `/cart/items/:id` | utente | imposta `{ quantity }` |
+| `DELETE` | `/cart/items/:id` | utente | rimuove la riga |
+| `GET` | `/orders` | utente | ordini dell'utente; filtri `status`, `from`, `to` (date `AAAA-MM-GG`) |
+| `GET` | `/orders/:id` | utente | dettaglio ordine (solo i propri) |
+| `POST` | `/orders` | utente | checkout: `{ order: { full_name, email, address, city, postal_code } }`; scala lo stock, 422 se la disponibilità non basta |
+| `GET` `POST` | `/admin/products` | admin | elenco completo (anche non attivi) e creazione |
+| `GET` `PATCH` `DELETE` | `/admin/products/:id` | admin | dettaglio, modifica, eliminazione |
+| `GET` | `/admin/users` | admin | elenco utenti |
+| `GET` `DELETE` | `/admin/users/:id` | admin | dettaglio ed eliminazione (non del proprio account) |
+| `GET` | `/up` | pubblico | health check di Rails |
+
+Codici di stato usati: `401` token assente, scaduto o revocato (o credenziali errate al login);
+`403` endpoint admin chiamato da un cliente, o riga di carrello di un altro utente;
+`404` risorsa inesistente (un ordine altrui risulta inesistente);
+`422` dati non validi; `400` parametri obbligatori mancanti.
 
 ## Problemi noti
 
