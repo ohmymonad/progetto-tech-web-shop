@@ -68,7 +68,26 @@ Scelte di modellazione:
 
 ## Autenticazione JWT
 
-_In preparazione._
+L'autenticazione usa **Devise** (gestione utenti e password con bcrypt) più **devise-jwt** (token
+stateless). Non esistono sessioni né cookie: ogni richiesta porta con sé il proprio token.
+
+1. **Emissione.** `POST /auth/login` e `POST /auth/signup` sono le sole `dispatch_requests`
+   configurate in `backend/config/initializers/devise.rb`. Se il controller autentica l'utente
+   (`sign_in(user, store: false)`), il middleware di devise-jwt aggiunge alla risposta l'header
+   `Authorization: Bearer <jwt>`. Il token è firmato con HS256 e contiene l'id dell'utente, un
+   `jti` univoco e la scadenza (24 ore).
+2. **Uso.** Il client rimanda l'header a ogni richiesta. `ApplicationController` ha
+   `before_action :authenticate_user!` come default, quindi ogni endpoint è protetto salvo quelli
+   che lo escludono esplicitamente (login e signup). Token assente, scaduto o con firma non valida → `401`.
+3. **Revoca.** `DELETE /auth/logout` è la `revocation_request`: il middleware salva il `jti` del token
+   nella tabella `jwt_denylists` (strategia `Denylist`, modello `JwtDenylist`). Da quel momento lo
+   stesso token, anche se non ancora scaduto, viene rifiutato con `401`.
+4. **Ruoli.** `User.role` è un enum `user` / `admin`. Il ruolo non è tra i parametri accettati dalla
+   registrazione, quindi un client non può assegnarselo. I controller sotto `/admin` includono il
+   concern `Admin::Authorization`, che risponde `403` a chi non è admin.
+
+Il CORS (`backend/config/initializers/cors.rb`) espone l'header `Authorization`: senza questa
+configurazione il browser non permetterebbe al frontend di leggerlo.
 
 ## Backend
 
