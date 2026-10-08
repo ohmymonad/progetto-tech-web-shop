@@ -217,7 +217,42 @@ backend, svuota lo stato locale e, tramite lo stesso `effect`, azzera il carrell
 
 ## Funzionalità avanzate
 
-_In preparazione._
+Sono implementate **entrambe** le funzionalità avanzate proposte dalla traccia: la seconda conta
+come bonus.
+
+### 1. Area Admin per prodotti (con gestione utenti)
+
+- **Backend:** namespace `/admin`. `Admin::ProductsController` offre il CRUD completo dei prodotti,
+  inclusi quelli non attivi. `Admin::UsersController` offre lista, dettaglio ed eliminazione degli
+  utenti; un admin non può eliminare il proprio account. Entrambi includono il concern
+  `Admin::Authorization` (`before_action :require_admin!`), che risponde `403` a chi non è admin,
+  qualunque cosa faccia il frontend.
+- **Frontend:** sezione `/admin` protetta da `adminGuard` (un utente non admin viene rimandato alla
+  home), servita da `AdminService`. Contiene:
+  - lista dei prodotti;
+  - form di creazione e modifica (lo stesso componente su `/admin/products/new` e `/admin/products/:id/edit`);
+  - eliminazione con conferma;
+  - lista e dettaglio degli utenti con eliminazione.
+
+  Il link "Admin" nella barra compare solo se `isAdmin()`.
+- **Eliminare un prodotto già ordinato** non è permesso: il model risponde con un errore di
+  validazione, mostrato come messaggio. Per toglierlo dal catalogo lo si disattiva (`active`).
+
+### 2. Storico ordini avanzato
+
+- **Backend:** `GET /orders` restituisce solo gli ordini dell'utente, dal più recente, con
+  filtri combinabili:
+  - `status` (uno degli stati dell'enum, altrimenti 422);
+  - `from` e `to` (date `AAAA-MM-GG`, inclusive: da inizio giornata a fine giornata).
+
+  `GET /orders/:id` restituisce l'ordine con righe, prodotti, prezzi congelati e indirizzo.
+- **Frontend:** la pagina "I miei ordini" (`/orders`) ha un form di filtro per stato e
+  intervallo di date. `OrderService` invia solo i filtri valorizzati. Il dettaglio (`/orders/:id`)
+  mostra:
+  - stato e data;
+  - destinatario e indirizzo di spedizione;
+  - una tabella con prodotto, prezzo al momento dell'ordine, quantità e subtotale;
+  - il totale.
 
 ## Test
 
