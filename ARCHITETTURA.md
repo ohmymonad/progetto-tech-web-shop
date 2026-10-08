@@ -91,7 +91,44 @@ configurazione il browser non permetterebbe al frontend di leggerlo.
 
 ## Backend
 
-_In preparazione._
+```
+backend/app/
+├── controllers/
+│   ├── application_controller.rb   # autenticazione di default + gestione centralizzata degli errori
+│   ├── auth/                       # sessions (login/logout), registrations (signup), me
+│   ├── products_controller.rb      # catalogo pubblico (solo prodotti attivi)
+│   ├── carts_controller.rb         # GET /cart
+│   ├── cart_items_controller.rb    # righe del carrello
+│   ├── orders_controller.rb        # storico, dettaglio, checkout
+│   ├── admin/                      # products (CRUD), users (lista, dettaglio, eliminazione)
+│   └── concerns/admin/authorization.rb
+├── models/                         # vedi "Modelli di dominio"
+└── serializers/                    # ProductSerializer, CartSerializer, OrderSerializer, UserSerializer
+```
+
+- **Controller sottili.** Le query stanno nei model (scope `Product.active`, `by_category`, `search`),
+  la forma del JSON nei serializer: ogni risposta è un oggetto con una chiave radice
+  (`{ product: … }`, `{ products: […], meta: {…} }`, `{ cart: … }`).
+- **Errori uniformi.** `ApplicationController` intercetta le eccezioni con `rescue_from` e risponde
+  sempre `{ "error": "messaggio" }`: `RecordNotFound` → 404, `RecordInvalid` → 422 con i messaggi di
+  validazione, `ParameterMissing` → 400, `NotAuthorized` → 403, `InvalidRequest` → 422, qualsiasi
+  altra eccezione → 500 (registrata nel log). I controller sollevano eccezioni invece di comporre a
+  mano le risposte d'errore.
+- **Accesso ai dati dell'utente.** Gli ordini si cercano sempre a partire da `current_user.orders`, quindi
+  l'ordine di un altro utente risulta inesistente (404). Le righe di carrello controllano il
+  proprietario e rispondono 403.
+- **Parametri.** Strong parameters ovunque; quantità e date sono validate esplicitamente (intero
+  in base 10, data ISO `AAAA-MM-GG`), così che un valore malformato dia 422 e non 500.
+- **Checkout transazionale con scalaggio del magazzino.** `OrdersController#create` fa tutto
+  dentro un'unica `ActiveRecord::Base.transaction`, quindi o riesce tutto o non cambia niente:
+  1. blocca i prodotti del carrello con `SELECT … FOR UPDATE`, in ordine di id per evitare deadlock;
+  2. verifica che lo `stock` basti per ogni riga e lo scala;
+  3. crea ordine e righe;
+  4. svuota il carrello.
+
+  Se anche un solo prodotto non ha disponibilità sufficiente, risponde 422 indicando il prodotto, e
+  stock, carrello e ordini restano come prima. Il lock impedisce a due checkout concorrenti di
+  vendere la stessa unità.
 
 ## Frontend
 
