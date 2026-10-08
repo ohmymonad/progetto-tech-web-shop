@@ -179,7 +179,41 @@ frontend/src/app/
 
 ## Flusso login → carrello → checkout → ordine
 
-_In preparazione._
+1. **Login.** La pagina `/login` (reactive form) chiama `AuthService.login()` →
+   `POST /auth/login`. Il backend verifica le credenziali e devise-jwt aggiunge
+   `Authorization: Bearer <jwt>` alla risposta. Il frontend salva il token, imposta `currentUser` e
+   torna alla pagina di partenza (`returnUrl`) oppure alla home (catalogo).
+2. **Caricamento del carrello.** Il cambio di `currentUser` attiva l'`effect` di `CartService`, che
+   chiama `GET /cart`. Il backend restituisce il carrello dell'utente, creandolo se non esiste,
+   con righe e totale. Il contatore nella barra di navigazione si aggiorna da solo (`itemCount`).
+3. **Catalogo e aggiunta.** `/products` chiama `GET /products?category=&q=&page=`. "Aggiungi al
+   carrello" chiama `POST /cart/items { product_id, quantity }`. Il backend crea la riga con il
+   prezzo corrente del prodotto (o somma la quantità se la riga esiste già) e restituisce il carrello
+   aggiornato, che il frontend adotta così com'è.
+4. **Carrello.** In `/cart` si cambiano le quantità (`PATCH /cart/items/:id`) o si rimuovono righe
+   (`DELETE /cart/items/:id`). Ogni risposta contiene il carrello completo, quindi i totali li calcola
+   sempre il backend.
+5. **Checkout.** `/checkout` è un reactive form con validatori: tutti i campi obbligatori, email valida,
+   CAP di 5 cifre. Finché il form non è valido non si invia nulla e gli errori compaiono sotto i campi.
+   All'invio la pagina passa allo stato `loading` e chiama `POST /orders { order: { full_name, email,
+   address, city, postal_code } }`.
+6. **Creazione dell'ordine (backend).** In una sola transazione:
+   - rifiuta un carrello vuoto (422);
+   - blocca i prodotti del carrello e ne scala lo `stock`. Se un prodotto non ha abbastanza unità
+     risponde 422 con il nome del prodotto, e la transazione annullata lascia tutto com'era;
+   - crea l'`Order` con il totale del carrello;
+   - copia ogni `CartItem` in un `OrderItem` con il suo `unit_price`;
+   - svuota il carrello.
+
+   Risponde `201` con l'ordine completo.
+7. **Conferma.** Il frontend mostra il numero d'ordine con il link al dettaglio e ricarica il carrello,
+   ora vuoto. In caso di errore la pagina mostra il messaggio del backend e permette di riprovare
+   senza perdere i dati inseriti.
+8. **Storico.** `/orders` elenca gli ordini (`GET /orders`) e `/orders/:id` ne mostra il dettaglio
+   (vedi [Funzionalità avanzate](#funzionalità-avanzate)).
+
+Il token resta valido per i giri successivi. Il logout (`DELETE /auth/logout`) lo revoca sul
+backend, svuota lo stato locale e, tramite lo stesso `effect`, azzera il carrello mostrato.
 
 ## Funzionalità avanzate
 
