@@ -132,7 +132,50 @@ backend/app/
 
 ## Frontend
 
-_In preparazione._
+```
+frontend/src/app/
+├── app.config.ts        # HttpClient + interceptor, router, ripristino della sessione all'avvio
+├── app.routes.ts        # rotte lazy con guard
+├── core/
+│   ├── api.config.ts    # token API_URL (http://localhost:3000)
+│   ├── auth.service.ts  # login, signup, logout, utente corrente
+│   ├── auth.interceptor.ts
+│   ├── error.interceptor.ts
+│   ├── http-error.ts    # errorMessage(): messaggio leggibile da qualsiasi errore HTTP
+│   ├── auth.guards.ts   # authGuard, adminGuard, guestGuard
+│   └── models.ts        # tipi delle risposte dell'API
+├── services/            # ProductService, CartService, OrderService, AdminService
+└── pages/               # componenti standalone, uno per pagina
+```
+
+- **Angular 21 zoneless, stato in signal.** Componenti standalone; lo stato condiviso vive nei servizi
+  come `signal` (privati in scrittura, esposti in sola lettura), con valori derivati tramite
+  `computed` (`isLoggedIn`, `isAdmin`, `itemCount`).
+- **Servizi con una responsabilità ciascuno.** Ogni chiamata HTTP passa da un servizio; le pagine
+  non usano `HttpClient` direttamente e nessun dato di prodotti, carrello o ordini è scritto nel codice.
+  - `AuthService`: legge il JWT dall'header `Authorization` delle risposte di login e signup, lo
+    salva in `localStorage` (chiave `shop.jwt`) ed espone `currentUser`. All'avvio,
+    `provideAppInitializer` chiama `GET /auth/me` per ripristinare la sessione prima della prima
+    navigazione, così le guard sanno già chi è l'utente.
+  - `CartService`: specchio del carrello sul backend. Un `effect` su `currentUser` lo carica al
+    login e lo azzera al logout. Dopo ogni modifica adotta il carrello restituito dal server; se la
+    modifica fallisce, rilegge `GET /cart` per riallinearsi.
+  - `ProductService`, `OrderService`, `AdminService`: traducono filtri e form in query string e
+    corpi delle richieste, ed estraggono la chiave radice della risposta.
+- **Interceptor.**
+  - `authInterceptor` aggiunge `Authorization: Bearer <jwt>` solo alle richieste dirette ad `API_URL`,
+    così il token non viene mai inviato ad altri domini.
+  - `errorInterceptor`: un `401` su qualsiasi endpoint diverso da login e signup significa token scaduto o
+    revocato. In quel caso chiude la sessione e porta a `/login?returnUrl=<pagina corrente>`.
+- **Stato delle richieste nelle pagine.** Le pagine tengono `loading` / `error` in signal (il
+  carrello usa quelli di `CartService`) e mostrano il messaggio ottenuto da `errorMessage()`: il campo `error` del backend se c'è, altrimenti un
+  messaggio di riserva per codice HTTP (0 = server non raggiungibile).
+- **Rotte e guard.** Tutte le pagine sono caricate lazy (`loadComponent`).
+  - `guestGuard`: login e registrazione, solo per chi non è autenticato.
+  - `authGuard`: catalogo, carrello, checkout, ordini.
+  - `adminGuard`: sezione `/admin`.
+
+  Le guard servono a evitare navigazioni inutili: il controllo vero dei permessi lo fa il backend.
 
 ## Flusso login → carrello → checkout → ordine
 
