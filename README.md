@@ -4,6 +4,9 @@ E-commerce minimale realizzato per il corso di Tecnologie di Sviluppo Web: catal
 carrello persistente, checkout con creazione dell'ordine e autenticazione JWT. Backend Rails 8 in
 modalità API, frontend Angular 21, database PostgreSQL, il tutto avviabile con Docker Compose.
 
+Modelli di dominio, flusso applicativo e funzionalità avanzate sono descritti in
+[ARCHITETTURA.md](ARCHITETTURA.md).
+
 ## Struttura del repository
 
 ```
@@ -11,6 +14,7 @@ modalità API, frontend Angular 21, database PostgreSQL, il tutto avviabile con 
 ├── docker-compose.yml   # db + backend + frontend, con il codice montato nei container
 ├── .env.example         # variabili d'ambiente di esempio (da copiare in .env)
 ├── README.md            # questo file
+├── ARCHITETTURA.md      # descrizione tecnica del progetto
 ├── backend/             # Rails 8.1 --api (Devise + devise-jwt, RSpec)
 └── frontend/            # Angular 21 (standalone, signal, Vitest)
 ```
