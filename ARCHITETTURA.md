@@ -256,4 +256,37 @@ come bonus.
 
 ## Test
 
-_In preparazione._
+Come lanciarli: [README → Test](README.md#test).
+
+### Backend: RSpec (100 esempi)
+
+- **Model spec** (`spec/models/`): validazioni e associazioni con shoulda-matchers, enum e valori
+  di default, scope di ricerca e filtro, calcolo del totale del carrello, unicità del prodotto nel carrello.
+- **Request spec** (`spec/requests/`): verificano gli endpoint end-to-end, con JWT reali e senza
+  mock del layer HTTP. `POST /orders`, l'endpoint più significativo, è coperto per:
+  - il caso con carrello pieno (totale, svuotamento del carrello, stock scalato, prezzo congelato
+    anche se il prodotto cambia dopo);
+  - il carrello vuoto;
+  - i dati cliente mancanti, verificando che carrello e stock restino intatti;
+  - la disponibilità insufficiente su uno dei prodotti: risponde 422 e non cambia niente, nemmeno lo
+    stock dei prodotti che sarebbero bastati.
+
+  Le spec di autenticazione coprono emissione, `401` e la revoca al logout (il token riusato
+  dopo il logout dà `401`).
+- **Shared example** (`spec/support/shared_examples.rb`): `"richiede autenticazione"` (9 usi) e
+  `"riservato agli admin"` (6 usi) applicano la stessa verifica di 401/403 a ogni endpoint protetto.
+- Dati creati con FactoryBot (`spec/factories/`); `spec/support/auth_helpers.rb` ottiene un JWT
+  vero facendo il login.
+
+### Frontend: Vitest (26 test)
+
+Test unitari con `HttpTestingController` (nessuna chiamata di rete reale):
+
+- `AuthService`: lettura del token dall'header, chiusura della sessione su 401 da `/auth/me`,
+  logout che pulisce la sessione anche se il backend fallisce;
+- interceptor: il Bearer token va solo verso `API_URL`; gestione del 401, tranne quello del login;
+- guard: redirect al login con `returnUrl`, blocco della sezione admin e delle pagine per ospiti;
+- `CartService`: caricamento al login, adozione del carrello dopo una modifica, riallineamento
+  dopo un errore, reset al logout;
+- `ProductService` e `OrderService`: query string con i soli filtri valorizzati, corpo del checkout;
+- pagina di checkout: email precompilata, stati di caricamento e conferma, messaggio d'errore e retry.
