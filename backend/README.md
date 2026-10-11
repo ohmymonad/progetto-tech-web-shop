@@ -1,24 +1,6 @@
-# README
+# Backend — Rails API
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+API REST dello shop (Rails 8.1 in modalità API, Devise + devise-jwt, PostgreSQL, RSpec).
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+Installazione, avvio, database e test sono descritti nel [README principale](../README.md);
+modelli, autenticazione e struttura dei controller in [ARCHITETTURA.md](../ARCHITETTURA.md).
