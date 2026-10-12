@@ -10,7 +10,9 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-shop}"]
+      # -d esplicito: senza, pg_isready usa un database con il nome dell'utente ("shop"),
+      # che non esiste, e Postgres scrive un FATAL nel log a ogni controllo.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-shop} -d ${POSTGRES_DB:-shop_development}"]
       interval: 5s
       timeout: 5s
       retries: 10
