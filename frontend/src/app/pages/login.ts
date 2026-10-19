@@ -9,6 +9,7 @@ import { errorMessage } from '../core/http-error';
   selector: 'app-login',
   imports: [ReactiveFormsModule, RouterLink],
   template: `
+  <div class="auth-card">
     <h2>Login</h2>
     <form [formGroup]="form" (ngSubmit)="submit()">
       <p>
@@ -26,7 +27,8 @@ import { errorMessage } from '../core/http-error';
     @if (error()) {
       <p class="error" role="alert">{{ error() }}</p>
     }
-    <p>Non hai un account? <a routerLink="/signup">Registrati</a></p>
+    <p class="alt">Non hai un account? <a routerLink="/signup">Registrati</a></p>
+  </div>
   `,
 })
 export class LoginPage {

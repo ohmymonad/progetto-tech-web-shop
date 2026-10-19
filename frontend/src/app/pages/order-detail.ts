@@ -18,9 +18,9 @@ import { STATUS_LABELS } from './orders';
       <p class="error" role="alert">{{ error() }} <button type="button" (click)="load()">Riprova</button></p>
     } @else if (order(); as o) {
       <h2>Ordine #{{ o.id }}</h2>
-      <dl>
+      <dl class="facts panel">
         <dt>Data</dt><dd>{{ o.created_at | date: 'dd/MM/yyyy HH:mm' }}</dd>
-        <dt>Stato</dt><dd>{{ labels[o.status] }}</dd>
+        <dt>Stato</dt><dd><span class="status status-{{ o.status }}">{{ labels[o.status] }}</span></dd>
         <dt>Cliente</dt><dd>{{ o.full_name }} &lt;{{ o.email }}&gt;</dd>
         <dt>Spedizione</dt><dd>{{ o.address }}, {{ o.postal_code }} {{ o.city }}</dd>
       </dl>

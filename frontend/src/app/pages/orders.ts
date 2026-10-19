@@ -41,7 +41,7 @@ export const STATUS_LABELS: Record<OrderStatus, string> = {
     } @else if (error()) {
       <p class="error" role="alert">{{ error() }} <button type="button" (click)="load()">Riprova</button></p>
     } @else if (orders().length === 0) {
-      <p>Nessun ordine trovato.</p>
+      <p class="empty">Nessun ordine trovato.</p>
     } @else {
       <table>
         <thead>
@@ -52,7 +52,7 @@ export const STATUS_LABELS: Record<OrderStatus, string> = {
             <tr>
               <td><a [routerLink]="['/orders', order.id]">{{ order.id }}</a></td>
               <td>{{ order.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
-              <td>{{ labels[order.status] }}</td>
+              <td><span class="status status-{{ order.status }}">{{ labels[order.status] }}</span></td>
               <td>{{ order.items.length }}</td>
               <td>{{ order.total | currency: 'EUR' }}</td>
             </tr>

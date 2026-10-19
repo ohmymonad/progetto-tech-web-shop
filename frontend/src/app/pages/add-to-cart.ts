@@ -7,7 +7,7 @@ import { CartService } from '../services/cart.service';
 @Component({
   selector: 'app-add-to-cart',
   template: `
-    <button type="button" [disabled]="busy() || disabled()" (click)="add()">
+    <button type="button" class="btn-cart" [disabled]="busy() || disabled()" (click)="add()">
       {{ busy() ? 'Aggiunta…' : 'Aggiungi al carrello' }}
     </button>
     <span role="status">

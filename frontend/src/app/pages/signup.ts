@@ -20,6 +20,7 @@ function passwordsMatch(group: AbstractControl): ValidationErrors | null {
   selector: 'app-signup',
   imports: [ReactiveFormsModule, RouterLink],
   template: `
+  <div class="auth-card">
     <h2>Registrazione</h2>
     <form [formGroup]="form" (ngSubmit)="submit()">
       <p>
@@ -47,7 +48,8 @@ function passwordsMatch(group: AbstractControl): ValidationErrors | null {
     @if (error()) {
       <p class="error" role="alert">{{ error() }}</p>
     }
-    <p>Hai già un account? <a routerLink="/login">Accedi</a></p>
+    <p class="alt">Hai già un account? <a routerLink="/login">Accedi</a></p>
+  </div>
   `,
 })
 export class SignupPage {

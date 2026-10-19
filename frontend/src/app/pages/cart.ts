@@ -25,8 +25,9 @@ import { CartService } from '../services/cart.service';
       </p>
     } @else if (cartService.cart(); as cart) {
       @if (cart.items.length === 0) {
-        <p>Il carrello è vuoto. <a routerLink="/products">Vai ai prodotti</a></p>
+        <p class="empty">Il carrello è vuoto. <a routerLink="/products">Vai ai prodotti</a></p>
       } @else {
+        <div class="cart-layout">
         <table>
           <thead>
             <tr><th>Prodotto</th><th>Prezzo</th><th>Quantità</th><th>Subtotale</th><th></th></tr>
@@ -38,7 +39,7 @@ import { CartService } from '../services/cart.service';
                 <td>{{ item.unit_price | currency: 'EUR' }}</td>
                 <td>
                   <label class="visually-hidden" [for]="'qty-' + item.id">Quantità di {{ item.name }}</label>
-                  <input #qty [id]="'qty-' + item.id" type="number" min="1" [value]="item.quantity" style="width: 4rem" />
+                  <input #qty [id]="'qty-' + item.id" type="number" min="1" [value]="item.quantity" style="width: 4.5rem" />
                   <button type="button" [disabled]="busy()" (click)="update(item, qty.valueAsNumber)">Aggiorna</button>
                 </td>
                 <td>{{ item.subtotal | currency: 'EUR' }}</td>
@@ -47,8 +48,12 @@ import { CartService } from '../services/cart.service';
             }
           </tbody>
         </table>
-        <p><strong>Totale: {{ cart.total | currency: 'EUR' }}</strong></p>
-        <p><a routerLink="/checkout">Procedi al checkout</a></p>
+        <aside class="summary">
+          <span>Totale ({{ cartService.itemCount() }} articoli)</span>
+          <strong class="price total">{{ cart.total | currency: 'EUR' }}</strong>
+          <a class="btn-link" routerLink="/checkout">Procedi al checkout</a>
+        </aside>
+        </div>
       }
     }
   `,

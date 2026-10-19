@@ -35,27 +35,33 @@ import { AddToCartButton } from './add-to-cart';
       <p class="error" role="alert">{{ error() }} <button type="button" (click)="load()">Riprova</button></p>
     } @else {
       @if (products().length === 0) {
-        <p>Nessun prodotto trovato.</p>
+        <p class="empty">Nessun prodotto trovato.</p>
       } @else {
-        <table>
-          <thead>
-            <tr><th>Nome</th><th>Categoria</th><th>Prezzo</th><th>Disponibilità</th><th></th></tr>
-          </thead>
-          <tbody>
-            @for (product of products(); track product.id) {
-              <tr>
-                <td><a [routerLink]="['/products', product.id]">{{ product.name }}</a></td>
-                <td>{{ product.category }}</td>
-                <td>{{ product.price | currency: 'EUR' }}</td>
-                <td>{{ product.stock }}</td>
-                <td><app-add-to-cart [productId]="product.id" [disabled]="product.stock === 0" /></td>
-              </tr>
-            }
-          </tbody>
-        </table>
+        <div class="grid">
+          @for (product of products(); track product.id) {
+            <article class="card">
+              <a class="thumb" [routerLink]="['/products', product.id]" [style.--hue]="(product.id * 47) % 360" aria-hidden="true" tabindex="-1">
+                {{ product.name.charAt(0).toUpperCase() }}
+              </a>
+              <div class="body">
+                @if (product.category) { <span class="category">{{ product.category }}</span> }
+                <h3><a [routerLink]="['/products', product.id]">{{ product.name }}</a></h3>
+                <span class="price">{{ product.price | currency: 'EUR' }}</span>
+                @if (product.stock === 0) {
+                  <span class="stock-out">Non disponibile</span>
+                } @else if (product.stock <= 5) {
+                  <span class="stock-low">Ne restano solo {{ product.stock }}</span>
+                } @else {
+                  <span class="stock-ok">Disponibile</span>
+                }
+                <div class="actions"><app-add-to-cart [productId]="product.id" [disabled]="product.stock === 0" /></div>
+              </div>
+            </article>
+          }
+        </div>
       }
       @if (meta(); as m) {
-        <p>
+        <p class="pager">
           <button type="button" (click)="goTo(m.page - 1)" [disabled]="m.page <= 1">← Precedente</button>
           Pagina {{ m.page }} di {{ m.total_pages || 1 }} ({{ m.total }} prodotti)
           <button type="button" (click)="goTo(m.page + 1)" [disabled]="m.page >= m.total_pages">Successiva →</button>
