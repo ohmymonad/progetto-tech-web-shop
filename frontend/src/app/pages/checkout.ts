@@ -15,20 +15,29 @@ type SubmitState = 'idle' | 'loading' | 'success' | 'error';
   selector: 'app-checkout',
   imports: [ReactiveFormsModule, RouterLink, CurrencyPipe],
   template: `
+  <!-- RICORDIAMO CHE A OGNI AGGIORNAMENTO DI STATO, VENGONO RICONTROLLATI TUTTI QUESTI @if e @else -->
     <h2>Checkout</h2>
-
+   <!-- appare se il checkout è andato a buon fine....-->
     @if (state() === 'success' && order(); as o) {
       <p class="success" role="status">
         Ordine #{{ o.id }} confermato! Totale {{ o.total | currency: 'EUR' }}.
-      </p>
+      </p>.current
       <p><a [routerLink]="['/orders', o.id]">Vedi il dettaglio</a> · <a routerLink="/products">Continua lo shopping</a></p>
-    } @else if (cart.cart(); as c) {
+    } 
+     <!-- .... altrimenti...-->
+
+    @else if (cart.cart(); as cart(); as c) {
       @if (c.items.length === 0) {
         <p>Il carrello è vuoto: non c'è nulla da ordinare. <a routerLink="/products">Vai ai prodotti</a></p>
-      } @else {
+      } 
+      @else {
         <p>{{ cart.itemCount() }} articoli, totale <strong>{{ c.total | currency: 'EUR' }}</strong> (<a routerLink="/cart">modifica</a>)</p>
-
+        
+        <!-- ngSubmit intercetta l'EVENTO DEL SUBMIT del form e chiama il metodo submit() della classe CheckoutPage -->
         <form [formGroup]="form" (ngSubmit)="submit()">
+        @if (form.invalid && form.touched) {
+          
+          <!-- la scelta per i dati di spedizione e' derma se il form è invalido e toccato , e lo stato e' ancora in loading-->
           <fieldset [disabled]="state() === 'loading'">
             <legend>Dati di spedizione</legend>
             @for (field of fields; track field.name) {
@@ -67,7 +76,7 @@ export class CheckoutPage {
   protected readonly error = signal<string | null>(null);
   protected readonly order = signal<Order | null>(null);
 
-  // inizializza il form con i dati dell'utente loggato, se presenti, altrimenti null
+  // inizializza il form con i dati dell'utente loggato
   // il form builder è iniettato come NonNullableFormBuilder per evitare che i controlli possano essere null
   protected readonly form = inject(NonNullableFormBuilder).group({
     full_name: ['', Validators.required],
@@ -90,7 +99,6 @@ export class CheckoutPage {
   submit(): void {
     // se il form non è valido, segna tutti i campi come toccati e ritorna
     // ricordiamo che il form e' invalido se almeno un controllo e' invalido
-
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -98,7 +106,8 @@ export class CheckoutPage {
     // se il form e' valido ..
     this.state.set('loading');
     this.error.set(null);
-
+    // al subscribe del servizio OrderService.create() viene lanciata la richiesta POST /orders con i dati del form (full_name, email, address, city, postal_code)
+    // e viene gestito qua la response(next per ok, error per codice HTTP di erore tipo 400 o 500)
     this.orders.create(this.form.getRawValue()).subscribe({
       next: (order) => {
         this.order.set(order);

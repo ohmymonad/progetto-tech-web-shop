@@ -9,6 +9,9 @@ Rails.application.routes.draw do
     post "auth/login", to: "auth/sessions#create"
     delete "auth/logout", to: "auth/sessions#destroy"
   end
+  # La rotta GET /auth/me serve per ottenere i dati dell'utente loggato, se il token JWT è valido.
+  # Il controller Auth::MeController#show restituisce i dati dell'utente loggato, se il token JWT è valido.
+  # altrimenti restituisce un errore 401 Unauthorized.(per esempio se il token è scaduto o non valido)
   get "auth/me", to: "auth/me#show"
 
   resources :products, only: %i[index show]

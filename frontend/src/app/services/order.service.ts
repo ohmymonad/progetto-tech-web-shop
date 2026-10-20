@@ -33,6 +33,8 @@ export class OrderService {
 
   // Crea l'ordine dal carrello dell'utente; 
   // il backend svuota il carrello. 
+  // ritorna un observable con l'ordine appena creato, che contiene l'id e lo stato
+  // al subscribe viene lanciata la richiesta POST /orders con i dati del form (full_name, email, address, city, postal_code)
   create(customer: CustomerData): Observable<Order> {
     return this.http
       .post<{ order: Order }>(`${this.apiUrl}/orders`, { order: customer })

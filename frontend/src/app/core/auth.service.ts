@@ -48,28 +48,32 @@ export class AuthService {
   }
 
   /** All'avvio: se c'è un token, ricarica l'utente da GET /auth/me. */
-  restoreSession(): Observable<User | null> {
-    if (!this.token()) return of(null);
+  
+  clearSession(): void {
+    localStorage.removeItem(TOKEN_KEY);
+    this.user.set(null);
+  }
 
+  restoreSession(): Observable<User | null> {
+    if (!this.token()) return of(null); //se non abbiamo token, ritorniamo subito null
+    // se abbiamo token, chiamiamo il backend per ottenere l'utente corrente
+    // al subscribe di questo observable, se la richiesta va a buon fine, viene settato il signal user con l'utente corrente
+    // altrimenti riceve un errore 401 e viene chiamata clearSession() per rimuovere il token e settare user a null
     return this.http.get<{ user: User }>(`${this.apiUrl}/auth/me`).pipe(
       map((body) => body.user),
       tap((user) => this.user.set(user)),
       catchError((err: HttpErrorResponse) => {
+        //in caso di errore, rimuove dal localStorage il token e setta il signal user a null
         if (err.status === 401) this.clearSession();
         return of(null);
       }),
     );
   }
 
-  clearSession(): void {
-    localStorage.removeItem(TOKEN_KEY);
-    this.user.set(null);
-  }
-
+  // salviamo in localStorage il token JWT e in un signal l'utente corrente
   private storeSession(res: HttpResponse<{ user: User }>): User {
     const token = res.headers.get('Authorization')?.replace(/^Bearer\s+/i, '');
     if (!token || !res.body) throw new Error('Risposta di autenticazione senza token');
-
     localStorage.setItem(TOKEN_KEY, token);
     this.user.set(res.body.user);
     return res.body.user;
