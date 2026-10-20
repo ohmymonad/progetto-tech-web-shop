@@ -31,7 +31,8 @@ export class OrderService {
     return this.http.get<{ order: Order }>(`${this.apiUrl}/orders/${id}`).pipe(map((body) => body.order));
   }
 
-  /** Crea l'ordine dal carrello dell'utente; il backend svuota il carrello. */
+  // Crea l'ordine dal carrello dell'utente; 
+  // il backend svuota il carrello. 
   create(customer: CustomerData): Observable<Order> {
     return this.http
       .post<{ order: Order }>(`${this.apiUrl}/orders`, { order: customer })

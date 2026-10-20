@@ -1,3 +1,4 @@
+#elementi di un ordine, collegati a un ordine e a un prodotto specifico
 class CreateOrderItems < ActiveRecord::Migration[8.1]
   def change
     create_table :order_items do |t|

@@ -67,6 +67,8 @@ export class CheckoutPage {
   protected readonly error = signal<string | null>(null);
   protected readonly order = signal<Order | null>(null);
 
+  // inizializza il form con i dati dell'utente loggato, se presenti, altrimenti null
+  // il form builder è iniettato come NonNullableFormBuilder per evitare che i controlli possano essere null
   protected readonly form = inject(NonNullableFormBuilder).group({
     full_name: ['', Validators.required],
     email: [inject(AuthService).currentUser()?.email ?? '', [Validators.required, Validators.email]],
@@ -82,12 +84,18 @@ export class CheckoutPage {
     { name: 'city', label: 'Città', type: 'text', autocomplete: 'address-level2', hint: 'Campo obbligatorio' },
     { name: 'postal_code', label: 'CAP', type: 'text', autocomplete: 'postal-code', hint: 'Il CAP deve avere 5 cifre' },
   ] as const;
-
+  // funzione per inviare l'ordine al backend:
+  //  se il form è valido, chiama il servizio OrderService.create()
+  //  e gestisce lo stato di caricamento, successo o errore
   submit(): void {
+    // se il form non è valido, segna tutti i campi come toccati e ritorna
+    // ricordiamo che il form e' invalido se almeno un controllo e' invalido
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
+    // se il form e' valido ..
     this.state.set('loading');
     this.error.set(null);
 

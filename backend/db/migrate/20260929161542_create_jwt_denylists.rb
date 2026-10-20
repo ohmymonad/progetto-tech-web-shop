@@ -1,3 +1,4 @@
+# Jtw tokens che sono stati revocati e non sono più validi per l'autenticazione.
 class CreateJwtDenylists < ActiveRecord::Migration[8.1]
   def change
     create_table :jwt_denylists do |t|

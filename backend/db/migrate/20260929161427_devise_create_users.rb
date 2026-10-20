@@ -1,3 +1,5 @@
+
+# Utenti del sistema, che possono accedere e utilizzare le funzionalità del negozio online.
 class DeviseCreateUsers < ActiveRecord::Migration[8.1]
   def change
     create_table :users do |t|

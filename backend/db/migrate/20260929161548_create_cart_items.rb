@@ -1,3 +1,4 @@
+# elementi del carrello, collegati a un carrello e a un prodotto specifico
 class CreateCartItems < ActiveRecord::Migration[8.1]
   def change
     create_table :cart_items do |t|

@@ -1,3 +1,6 @@
+# ordini, a cui corrispondono i prodotti acquistati da un utente.
+# Ogni ordine è associato a un utente e contiene informazioni come il nome completo,
+# l'email, l'indirizzo, la città, il codice postale, il totale dell'ordine e lo stato dell'ordine.
 class CreateOrders < ActiveRecord::Migration[8.1]
   def change
     create_table :orders do |t|

@@ -1,3 +1,4 @@
+# Products, che rappresentano gli articoli disponibili per la vendita nel negozio online.
 class CreateProducts < ActiveRecord::Migration[8.1]
   def change
     create_table :products do |t|

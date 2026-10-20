@@ -14,7 +14,7 @@ class OrdersController < ApplicationController
   # Trasforma il carrello in ordine: stock scalato, prezzi congelati, totale calcolato, carrello svuotato.
   # Qualsiasi errore annulla l'intera transazione, stock compreso.
   def create
-    cart = current_cart
+    cart = current_cart #definito in ApplicationController
     raise InvalidRequest, "Il carrello è vuoto" if cart.cart_items.empty?
 
     order = nil
