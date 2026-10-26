@@ -21,12 +21,12 @@ type SubmitState = 'idle' | 'loading' | 'success' | 'error';
     @if (state() === 'success' && order(); as o) {
       <p class="success" role="status">
         Ordine #{{ o.id }} confermato! Totale {{ o.total | currency: 'EUR' }}.
-      </p>.current
+      </p>
       <p><a [routerLink]="['/orders', o.id]">Vedi il dettaglio</a> · <a routerLink="/products">Continua lo shopping</a></p>
     } 
      <!-- .... altrimenti...-->
 
-    @else if (cart.cart(); as cart(); as c) {
+    @else if (cart.cart(); as c) {
       @if (c.items.length === 0) {
         <p>Il carrello è vuoto: non c'è nulla da ordinare. <a routerLink="/products">Vai ai prodotti</a></p>
       } 
@@ -35,9 +35,7 @@ type SubmitState = 'idle' | 'loading' | 'success' | 'error';
         
         <!-- ngSubmit intercetta l'EVENTO DEL SUBMIT del form e chiama il metodo submit() della classe CheckoutPage -->
         <form [formGroup]="form" (ngSubmit)="submit()">
-        @if (form.invalid && form.touched) {
-          
-          <!-- la scelta per i dati di spedizione e' derma se il form è invalido e toccato , e lo stato e' ancora in loading-->
+          <!-- il fieldset viene disabilitato mentre l'ordine è in invio (state === 'loading') -->
           <fieldset [disabled]="state() === 'loading'">
             <legend>Dati di spedizione</legend>
             @for (field of fields; track field.name) {
