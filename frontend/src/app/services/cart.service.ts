@@ -8,7 +8,7 @@ import { errorMessage } from '../core/http-error';
 import { Cart } from '../core/models';
 
 /**
- * Il carrello vive sul backend: questo servizio ne tiene solo lo specchio.
+ * Il carrello vive sul backend: questo servizio ne tiene solo lo specchio fetchandolo dal backend.
  * Si carica da GET /cart al login (o al reload con token valido) e dopo ogni
  * mutazione adotta il carrello restituito dal backend; se una mutazione
  * fallisce, si riallinea rileggendo GET /cart.
@@ -61,7 +61,8 @@ export class CartService {
   remove(itemId: number): Observable<Cart> {
     return this.syncCart(this.http.delete<{ cart: Cart }>(`${this.apiUrl}/cart/items/${itemId}`));
   }
-  // riceve un observable con elementi di interfaccia Cart,\
+  // chiamato in caso di add update o insert, si occupa di aggiornare lo stato del carrello lato backend
+  // riceve un observable con elementi di interfaccia Cart,
   // ritorna un nuovo observable che mappa la risposta del backend al carrello, aggiorna lo stato e gestisce gli errori
   private syncCart(request: Observable<{ cart: Cart }>): Observable<Cart> {
     // ritorna nuovo observavle che mappa la risposta del backend al carrello, aggiorna lo stato e gestisce gli errori

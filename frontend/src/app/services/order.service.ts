@@ -22,12 +22,17 @@ export class OrderService {
     for (const [key, value] of Object.entries(filters)) {
       if (value) params = params.set(key, value);
     }
+    //chiamata con sintassi esotica di get, significa: 
+    // ritorna un observable che emette un oggetto con la proprietà orders, che è un array di Order
     return this.http
       .get<{ orders: Order[] }>(`${this.apiUrl}/orders`, { params })
       .pipe(map((body) => body.orders));
   }
-
+  // ma get prende numero o stringa, come posso passargliun oggetto con proprieta' orders come faccio nel metodo list?
+  // il backend ritorna un oggetto con la proprietà order, che è un Order 
   get(id: number | string): Observable<Order> {
+    //cosa succede se gli passo una string come id?
+    // ritorna un observable che emette un oggetto con la proprietà order, che è un Order
     return this.http.get<{ order: Order }>(`${this.apiUrl}/orders/${id}`).pipe(map((body) => body.order));
   }
 

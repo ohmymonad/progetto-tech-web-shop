@@ -5,9 +5,9 @@ Rails.application.routes.draw do
   # Devise serve solo per la mappatura dello scope :user; le rotte sono dichiarate a mano.
   devise_for :users, skip: :all
   devise_scope :user do
-    post "auth/signup", to: "auth/registrations#create"
-    post "auth/login", to: "auth/sessions#create"
-    delete "auth/logout", to: "auth/sessions#destroy"
+    post "auth/signup", to: "auth/registrations#create" #crea un nuovo utente 
+    post "auth/login", to: "auth/sessions#create" # ritorna jwt di login 
+    delete "auth/logout", to: "auth/sessions#destroy" #distroy jwt di login
   end
   # La rotta GET /auth/me serve per ottenere i dati dell'utente loggato, se il token JWT è valido.
   # Il controller Auth::MeController#show restituisce i dati dell'utente loggato, se il token JWT è valido.
@@ -18,7 +18,7 @@ Rails.application.routes.draw do
 
   resource :cart, only: :show
   resources :cart_items, path: "cart/items", only: %i[create update destroy]
-
+  # a che routes precise corrisponde
   resources :orders, only: %i[index show create]
 
   namespace :admin do

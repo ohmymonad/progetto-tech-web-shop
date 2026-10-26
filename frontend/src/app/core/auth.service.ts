@@ -22,16 +22,17 @@ export class AuthService {
   readonly isLoggedIn = computed(() => this.user() !== null);
   readonly isAdmin = computed(() => this.user()?.role === 'admin');
 
+    //ritorna il token JWT salvato in localStorage, o null se non c'è
   token(): string | null {
     return localStorage.getItem(TOKEN_KEY);
   }
-
+  // ritorna un observable che emette l'utente corrente se c'è un token valido, altrimenti null
   login(email: string, password: string): Observable<User> {
     return this.http
       .post<{ user: User }>(`${this.apiUrl}/auth/login`, { user: { email, password } }, { observe: 'response' })
       .pipe(map((res) => this.storeSession(res)));
   }
-
+  // ritorna un observable che emette l'utente appena creato se la registrazione va a buon fine, altrimenti lancia un errore
   signup(email: string, password: string): Observable<User> {
     return this.http
       .post<{ user: User }>(`${this.apiUrl}/auth/signup`, { user: { email, password } }, { observe: 'response' })
