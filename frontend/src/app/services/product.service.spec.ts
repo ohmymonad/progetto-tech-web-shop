@@ -17,12 +17,20 @@ describe('ProductService', () => {
   afterEach(() => http.verify());
 
   it('passa filtri e paginazione come query string, omettendo quelli vuoti', () => {
-    service.list({ q: 'mouse', category: '', page: 2, per_page: 5 }).subscribe();
+    service.list({ q: 'mouse', tag: '', page: 2, per_page: 5 }).subscribe();
 
     const req = http.expectOne((r) => r.url === 'http://localhost:3000/products');
     expect(req.request.params.keys().sort()).toEqual(['page', 'per_page', 'q']);
     expect(req.request.params.get('page')).toBe('2');
     req.flush({ products: [], meta: { page: 2, per_page: 5, total: 0, total_pages: 0 } });
+  });
+
+  it('estrae l\'elenco delle categorie', () => {
+    let categories: string[] = [];
+    service.categories().subscribe((c) => (categories = c));
+
+    http.expectOne('http://localhost:3000/products/categories').flush({ categories: ['casa', 'sport'] });
+    expect(categories).toEqual(['casa', 'sport']);
   });
 
   it('estrae il prodotto dal dettaglio', () => {

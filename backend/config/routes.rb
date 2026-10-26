@@ -14,7 +14,9 @@ Rails.application.routes.draw do
   # altrimenti restituisce un errore 401 Unauthorized.(per esempio se il token è scaduto o non valido)
   get "auth/me", to: "auth/me#show"
 
-  resources :products, only: %i[index show]
+  resources :products, only: %i[index show] do
+    get :categories, on: :collection
+  end
 
   resource :cart, only: :show
   resources :cart_items, path: "cart/items", only: %i[create update destroy]
