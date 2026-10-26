@@ -7,7 +7,7 @@ import { PageMeta, Product } from '../core/models';
 
 export interface ProductQuery {
   q?: string;
-  category?: string;
+  tag?: string;
   page?: number;
   per_page?: number;
 }
@@ -28,6 +28,10 @@ export class ProductService {
       if (value !== undefined && value !== '') params = params.set(key, String(value));
     }
     return this.http.get<ProductPage>(`${this.apiUrl}/products`, { params });
+  }
+
+  categories(): Observable<string[]> {
+    return this.http.get<{ categories: string[] }>(`${this.apiUrl}/products/categories`).pipe(map((body) => body.categories));
   }
 
   get(id: number | string): Observable<Product> {

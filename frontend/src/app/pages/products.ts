@@ -1,7 +1,8 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { errorMessage } from '../core/http-error';
 import { PageMeta, Product } from '../core/models';
@@ -17,8 +18,13 @@ import { AddToCartButton } from './add-to-cart';
     <form [formGroup]="filters" (ngSubmit)="search()" role="search">
       <label for="q">Cerca</label>
       <input id="q" type="search" formControlName="q" />
-      <label for="category">Categoria</label>
-      <input id="category" type="text" formControlName="category" />
+      <label for="tag">Categoria</label>
+      <select id="tag" formControlName="tag" (change)="search()">
+        <option value="">Tutte le categorie</option>
+        @for (category of categories(); track category) {
+          <option [value]="category">{{ category }}</option>
+        }
+      </select>
       <label for="per_page">Per pagina</label>
       <select id="per_page" formControlName="per_page">
         <option [ngValue]="5">5</option>
@@ -72,25 +78,42 @@ import { AddToCartButton } from './add-to-cart';
 })
 export class ProductsPage implements OnInit {
   private readonly productService = inject(ProductService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly products = signal<Product[]>([]);
+  protected readonly categories = signal<string[]>([]);
   protected readonly meta = signal<PageMeta | null>(null);
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly filters = inject(NonNullableFormBuilder).group({
     q: [''],
-    category: [''],
+    tag: [''],
     per_page: [10],
   });
   private page = 1;
 
   ngOnInit(): void {
-    this.load();
+    this.productService.categories().subscribe({ next: (categories) => this.categories.set(categories) });
+
+    // L'URL (?q=&tag=&page=&per_page=) è la fonte di verità: ogni cambio ripopola il form e ricarica.
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      this.filters.patchValue(
+        {
+          q: params.get('q') ?? '',
+          tag: params.get('tag') ?? '',
+          per_page: Number(params.get('per_page')) || 10,
+        },
+        { emitEvent: false },
+      );
+      this.page = Math.max(Number(params.get('page')) || 1, 1);
+      this.load();
+    });
   }
 
   search(): void {
-    this.page = 1;
-    this.load();
+    this.navigate(1);
   }
 
   reset(): void {
@@ -99,16 +122,24 @@ export class ProductsPage implements OnInit {
   }
 
   goTo(page: number): void {
-    this.page = page;
-    this.load();
+    this.navigate(page);
+  }
+
+  // Scrive i filtri nell'URL omettendo quelli vuoti; il caricamento parte dalla sottoscrizione a queryParamMap.
+  private navigate(page: number): void {
+    const { q, tag, per_page } = this.filters.getRawValue();
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { q: q.trim() || null, tag: tag || null, page: page > 1 ? page : null, per_page },
+    });
   }
 
   load(): void {
-    const { q, category, per_page } = this.filters.getRawValue();
+    const { q, tag, per_page } = this.filters.getRawValue();
     this.loading.set(true);
     this.error.set(null);
 
-    this.productService.list({ q: q.trim(), category: category.trim(), page: this.page, per_page }).subscribe({
+    this.productService.list({ q: q.trim(), tag, page: this.page, per_page }).subscribe({
       next: ({ products, meta }) => {
         this.products.set(products);
         this.meta.set(meta);
