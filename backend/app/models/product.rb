@@ -10,8 +10,6 @@ class Product < ApplicationRecord
   validates :stock, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   #scopes utilizzati per snellire le query nel controller ProductsController#index
   scope :active, -> { where(active: true) }
-  scope :by_category, ->(name) { name.present? ? joins(:category).where(categories: { name: name }) : all }
-
   # filtra per nome di categoria, con una join sulla tabella categories
   scope :by_category, ->(name) { name.present? ? joins(:category).where(categories: { name: name }) : all }
   #sperimentiamo un attimo con le lambdas per fare una ricerca full text sui prodotti

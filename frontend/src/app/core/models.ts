@@ -20,10 +20,7 @@ export interface Product {
   category: string;
   active: boolean;
 }
-<<<<<<< HEAD
-//interfaccia per la query dei prodotti, usata in ProductService.list()
-//metadati di paginazione ritornati da API
-=======
+
 
 export interface Category {
   id: number;
@@ -31,15 +28,6 @@ export interface Category {
   default: boolean;
   products_count: number;
 }
-
-export interface Category {
-  id: number;
-  name: string;
-  default: boolean;
-  products_count: number;
-}
-
->>>>>>> b75bc72 (feat: categorie come tabella a sé (products.category_id), CRUD admin e menu filtri dalla tabella)
 export interface PageMeta {
   page: number;
   per_page: number;
