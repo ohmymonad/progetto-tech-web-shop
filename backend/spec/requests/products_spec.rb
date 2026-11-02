@@ -18,8 +18,8 @@ RSpec.describe "Prodotti", type: :request do
     end
 
     it "filtra per categoria con ?tag=" do
-      create(:product, category: "sport")
-      create(:product, category: "casa")
+      create(:product, category: create(:category, name: "sport"))
+      create(:product, category: create(:category, name: "casa"))
       get "/products", params: { tag: "sport" }, headers: headers
       expect(json["products"].map { |p| p["category"] }).to eq(["sport"])
     end
@@ -43,15 +43,15 @@ RSpec.describe "Prodotti", type: :request do
     def send_request(h) = get("/products/categories", headers: h)
     it_behaves_like "richiede autenticazione"
 
-    it "elenca le categorie distinte e ordinate dei soli prodotti attivi" do
-      create(:product, category: "sport")
-      create(:product, category: "casa")
-      create(:product, category: "sport")
-      create(:product, category: "giardino", active: false)
-      create(:product, category: nil)
+    it "elenca tutte le categorie dalla tabella in ordine alfabetico" do
+      create(:product, category: create(:category, name: "sport"))
+      create(:product, category: create(:category, name: "casa"))
+      create(:product, category: create(:category, name: "sport"))
+      create(:product, category: create(:category, name: "giardino"), active: false)
+      create(:category, name: "vuota")
       get "/products/categories", headers: headers
       expect(response).to have_http_status(:ok)
-      expect(json["categories"]).to eq(%w[casa sport])
+      expect(json["categories"]).to eq(%w[casa giardino sport vuota])
     end
   end
 

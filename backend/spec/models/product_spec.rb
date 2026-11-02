@@ -9,9 +9,9 @@ RSpec.describe Product, type: :model do
   it { is_expected.to have_many(:order_items) }
 
   describe "scope" do
-    let!(:casa) { create(:product, name: "Lampada", category: "casa") }
-    let!(:sport) { create(:product, name: "Pallone", category: "sport") }
-    let!(:nascosto) { create(:product, name: "Vecchio", category: "casa", active: false) }
+    let!(:casa) { create(:product, name: "Lampada", category: create(:category, name: "casa")) }
+    let!(:sport) { create(:product, name: "Pallone", category: create(:category, name: "sport")) }
+    let!(:nascosto) { create(:product, name: "Vecchio", category: create(:category, name: "casa"), active: false) }
 
     it "active esclude i prodotti disattivati" do
       expect(Product.active).to contain_exactly(casa, sport)

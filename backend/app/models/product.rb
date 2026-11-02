@@ -1,14 +1,21 @@
 class Product < ApplicationRecord
+  belongs_to :category
   has_many :cart_items, dependent: :restrict_with_error
   has_many :order_items, dependent: :restrict_with_error
+
+  before_validation { self.category ||= Category.default }
 
   validates :name, presence: true
   validates :price, presence: true, numericality: { greater_than: 0 }
   validates :stock, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   #scopes utilizzati per snellire le query nel controller ProductsController#index
   scope :active, -> { where(active: true) }
+<<<<<<< HEAD
   scope :by_category, ->(category) { category.present? ? where(category: category) : all }
   #sperimentiamo un attimo con le lambdas per fare una ricerca full text sui prodotti
+=======
+  scope :by_category, ->(name) { name.present? ? joins(:category).where(categories: { name: name }) : all }
+>>>>>>> b75bc72 (feat: categorie come tabella a sé (products.category_id), CRUD admin e menu filtri dalla tabella)
   scope :search, lambda { |term|
     ## se term è nil, stringa vuota o fatta solo di spazi, esci subito restituendo all
     next all if term.blank?

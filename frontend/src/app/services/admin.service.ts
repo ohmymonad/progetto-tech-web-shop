@@ -3,9 +3,9 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { API_URL } from '../core/api.config';
-import { Product, User } from '../core/models';
+import { Category, Product, User } from '../core/models';
 
-export type ProductInput = Omit<Product, 'id' | 'price'> & { price: number | string };
+export type ProductInput = Omit<Product, 'id' | 'price' | 'category'> & { price: number | string };
 
 /** Endpoint /admin/*: il backend risponde 403 a chi non è admin. */
 @Injectable({ providedIn: 'root' })
@@ -33,6 +33,27 @@ export class AdminService {
 
   deleteProduct(id: number): Observable<void> {
     return this.http.delete(`${this.base}/products/${id}`).pipe(map(() => undefined));
+  }
+
+  categories(): Observable<Category[]> {
+    return this.http.get<{ categories: Category[] }>(`${this.base}/categories`).pipe(map((b) => b.categories));
+  }
+
+  createCategory(name: string): Observable<Category> {
+    return this.http
+      .post<{ category: Category }>(`${this.base}/categories`, { category: { name } })
+      .pipe(map((b) => b.category));
+  }
+
+  renameCategory(id: number, name: string): Observable<Category> {
+    return this.http
+      .patch<{ category: Category }>(`${this.base}/categories/${id}`, { category: { name } })
+      .pipe(map((b) => b.category));
+  }
+
+  /** I prodotti della categoria eliminata passano a "non-categorized". */
+  deleteCategory(id: number): Observable<void> {
+    return this.http.delete(`${this.base}/categories/${id}`).pipe(map(() => undefined));
   }
 
   users(): Observable<User[]> {

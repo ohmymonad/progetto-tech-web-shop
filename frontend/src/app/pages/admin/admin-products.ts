@@ -11,7 +11,7 @@ import { AdminService } from '../../services/admin.service';
   imports: [RouterLink, CurrencyPipe],
   template: `
     <h2>Admin · Prodotti</h2>
-    <p><a routerLink="/admin/products/new">+ Nuovo prodotto</a> · <a routerLink="/admin/users">Utenti</a></p>
+    <p><a routerLink="/admin/products/new">+ Nuovo prodotto</a> · <a routerLink="/admin/categories">Categorie</a> · <a routerLink="/admin/users">Utenti</a></p>
 
     @if (actionError()) {
       <p class="error" role="alert">{{ actionError() }}</p>
