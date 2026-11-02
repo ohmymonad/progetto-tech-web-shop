@@ -1,4 +1,7 @@
 class OrdersController < ApplicationController
+  # Attesa artificiale (secondi) prima di rispondere al checkout, per mostrare il "Loading…" nel frontend.
+  ARTIFICIAL_DELAY = 5
+
   def index
     orders = current_user.orders.includes(order_items: :product).order(created_at: :desc, id: :desc)
     orders = filter_by_status(orders)
@@ -31,7 +34,14 @@ class OrdersController < ApplicationController
       cart.cart_items.destroy_all
     end
 
+    sleep ARTIFICIAL_DELAY
     render json: { order: OrderSerializer.call(order) }, status: :created
+  end
+
+  # Route farlocca: non tocca DB, carrello o stock. Aspetta e risponde sempre con errore.
+  def create_failing
+    sleep ARTIFICIAL_DELAY
+    render_error("errore - ordine non andato a buon fine", :unprocessable_entity)
   end
 
   private

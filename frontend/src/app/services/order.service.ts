@@ -45,4 +45,11 @@ export class OrderService {
       .post<{ order: Order }>(`${this.apiUrl}/orders`, { order: customer })
       .pipe(map((body) => body.order));
   }
+
+  // Ordine farlocco di test: il backend aspetta 5s e risponde sempre con errore 422.
+  createFailing(customer: CustomerData): Observable<Order> {
+    return this.http
+      .post<{ order: Order }>(`${this.apiUrl}/orders/fail`, { order: customer })
+      .pipe(map((body) => body.order));
+  }
 }

@@ -27,6 +27,8 @@ Rails.application.routes.draw do
   resource :cart, only: :show
   resources :cart_items, path: "cart/items", only: %i[create update destroy]
   # a che routes precise corrisponde
+  # ordine farlocco che fallisce sempre (dopo 5s): prima di resources :orders per non finire in orders/:id
+  post "orders/fail", to: "orders#create_failing"
   resources :orders, only: %i[index show create]
 
   namespace :admin do

@@ -47,17 +47,19 @@ type SubmitState = 'idle' | 'loading' | 'success' | 'error';
                 }
               </p>
             }
-            <button type="submit" [disabled]="form.invalid">Conferma ordine</button>
+            <button type="submit" [disabled]="form.invalid || state() === 'loading'">Conferma ordine</button>
+            <!-- TEST: usa la route farlocca che fallisce sempre dopo 5s -->
+            <button type="button" [disabled]="form.invalid || state() === 'loading'" (click)="submit(true)">Simula ordine fallito</button>
           </fieldset>
         </form>
 
         @if (state() === 'loading') {
-          <p role="status">Invio dell'ordine in corso…</p>
+          <p class="loading" role="status"><strong>Loading…</strong> Invio dell'ordine in corso…</p>
         }
         @if (state() === 'error') {
           <p class="error" role="alert">
             Ordine non riuscito: {{ error() }}
-            <button type="button" (click)="submit()">Riprova</button>
+            <button type="button" (click)="submit(lastSimulated)">Riprova</button>
           </p>
         }
       }
@@ -94,7 +96,10 @@ export class CheckoutPage {
   // funzione per inviare l'ordine al backend:
   //  se il form è valido, chiama il servizio OrderService.create()
   //  e gestisce lo stato di caricamento, successo o errore
-  submit(): void {
+  // simulateFailure=true usa la route farlocca POST /orders/fail (solo per test)
+  protected lastSimulated = false;
+
+  submit(simulateFailure = false): void {
     // se il form non è valido, segna tutti i campi come toccati e ritorna
     // ricordiamo che il form e' invalido se almeno un controllo e' invalido
     if (this.form.invalid) {
@@ -106,7 +111,9 @@ export class CheckoutPage {
     this.error.set(null);
     // al subscribe del servizio OrderService.create() viene lanciata la richiesta POST /orders con i dati del form (full_name, email, address, city, postal_code)
     // e viene gestito qua la response(next per ok, error per codice HTTP di erore tipo 400 o 500)
-    this.orders.create(this.form.getRawValue()).subscribe({
+    this.lastSimulated = simulateFailure;
+    const request = simulateFailure ? this.orders.createFailing : this.orders.create;
+    request.call(this.orders, this.form.getRawValue()).subscribe({
       next: (order) => {
         this.order.set(order);
         this.state.set('success');
