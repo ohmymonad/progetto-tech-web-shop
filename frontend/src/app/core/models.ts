@@ -15,8 +15,23 @@ export interface Product {
   description: string | null;
   price: string;
   stock: number;
-  category: string | null;
+  category_id: number;
+  category: string;
   active: boolean;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+  default: boolean;
+  products_count: number;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+  default: boolean;
+  products_count: number;
 }
 
 export interface PageMeta {

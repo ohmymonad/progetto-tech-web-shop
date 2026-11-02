@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_29_161552) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_02_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -31,6 +31,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_161552) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_carts_on_user_id", unique: true
+  end
+
+  create_table "categories", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_categories_on_name", unique: true
   end
 
   create_table "jwt_denylists", force: :cascade do |t|
@@ -68,14 +75,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_161552) do
 
   create_table "products", force: :cascade do |t|
     t.boolean "active", default: true, null: false
-    t.string "category"
+    t.bigint "category_id", null: false
     t.datetime "created_at", null: false
     t.text "description"
     t.string "name", null: false
     t.decimal "price", precision: 10, scale: 2, null: false
     t.integer "stock", default: 0, null: false
     t.datetime "updated_at", null: false
-    t.index ["category"], name: "index_products_on_category"
+    t.index ["category_id"], name: "index_products_on_category_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -93,4 +100,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_161552) do
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
   add_foreign_key "orders", "users"
+  add_foreign_key "products", "categories", on_update: :cascade, on_delete: :restrict
 end

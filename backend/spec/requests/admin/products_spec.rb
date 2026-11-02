@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "Admin prodotti", type: :request do
   let(:admin) { create(:admin) }
-  let(:attrs) { { name: "Nuovo", description: "d", price: 9.9, stock: 3, category: "casa", active: true } }
+  let(:attrs) { { name: "Nuovo", description: "d", price: 9.9, stock: 3, category_id: create(:category).id, active: true } }
 
   describe "POST /admin/products" do
     def send_request(h) = post("/admin/products", params: { product: attrs }, headers: h, as: :json)

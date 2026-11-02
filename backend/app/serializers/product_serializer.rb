@@ -6,7 +6,8 @@ class ProductSerializer
       description: product.description,
       price: product.price,
       stock: product.stock,
-      category: product.category,
+      category_id: product.category_id,
+      category: product.category.name,
       active: product.active
     }
   end

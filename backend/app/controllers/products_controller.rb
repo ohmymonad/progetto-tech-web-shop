@@ -3,7 +3,7 @@ class ProductsController < ApplicationController
   MAX_PER_PAGE = 100
 
   def index
-    scope = Product.active.by_category(params[:tag]).search(params[:q]).order(:id)
+    scope = Product.active.includes(:category).by_category(params[:tag]).search(params[:q]).order(:id)
     page = [params.fetch(:page, 1).to_i, 1].max
     per_page = params.fetch(:per_page, DEFAULT_PER_PAGE).to_i.clamp(1, MAX_PER_PAGE)
     total = scope.count
@@ -19,9 +19,9 @@ class ProductsController < ApplicationController
     }
   end
 
-  # Categorie distinte dei prodotti attivi, per il menu a tendina del filtro.
+  # Nomi di tutte le categorie (tabella categories), per il menu a tendina del filtro.
   def categories
-    render json: { categories: Product.active.where.not(category: [nil, ""]).distinct.order(:category).pluck(:category) }
+    render json: { categories: Category.alphabetical.pluck(:name) }
   end
 
   def show

@@ -5,7 +5,7 @@ module Admin
     before_action :set_product, only: %i[show update destroy]
 
     def index
-      render json: { products: Product.order(:id).map { |p| ProductSerializer.call(p) } }
+      render json: { products: Product.includes(:category).order(:id).map { |p| ProductSerializer.call(p) } }
     end
 
     def show
@@ -37,7 +37,7 @@ module Admin
     end
 
     def product_params
-      params.require(:product).permit(:name, :description, :price, :stock, :category, :active)
+      params.require(:product).permit(:name, :description, :price, :stock, :category_id, :active)
     end
   end
 end
