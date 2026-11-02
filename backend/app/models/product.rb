@@ -10,12 +10,11 @@ class Product < ApplicationRecord
   validates :stock, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   #scopes utilizzati per snellire le query nel controller ProductsController#index
   scope :active, -> { where(active: true) }
-<<<<<<< HEAD
-  scope :by_category, ->(category) { category.present? ? where(category: category) : all }
-  #sperimentiamo un attimo con le lambdas per fare una ricerca full text sui prodotti
-=======
   scope :by_category, ->(name) { name.present? ? joins(:category).where(categories: { name: name }) : all }
->>>>>>> b75bc72 (feat: categorie come tabella a sé (products.category_id), CRUD admin e menu filtri dalla tabella)
+
+  # filtra per nome di categoria, con una join sulla tabella categories
+  scope :by_category, ->(name) { name.present? ? joins(:category).where(categories: { name: name }) : all }
+  #sperimentiamo un attimo con le lambdas per fare una ricerca full text sui prodotti
   scope :search, lambda { |term|
     ## se term è nil, stringa vuota o fatta solo di spazi, esci subito restituendo all
     next all if term.blank?
@@ -27,5 +26,5 @@ class Product < ApplicationRecord
 
   def self.page(page = 1, per_page = 20)
     offset((page - 1) * per_page).limit(per_page)
-end
+  end
 end

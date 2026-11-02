@@ -3,13 +3,7 @@ class ProductsController < ApplicationController
   MAX_PER_PAGE = 100
 
   def index
-<<<<<<< HEAD
-    ## tag e q sono parametri della query string, per esempio /products?tag=foo&q=bar
-    scope = Product.active.by_category(params[:tag]).search(params[:q]).order(:id)
-    ## page e per_page sono parametri della query string, per esempio /products?page=2&per_page=10
-=======
     scope = Product.active.includes(:category).by_category(params[:tag]).search(params[:q]).order(:id)
->>>>>>> b75bc72 (feat: categorie come tabella a sé (products.category_id), CRUD admin e menu filtri dalla tabella)
     page = [params.fetch(:page, 1).to_i, 1].max
     per_page = params.fetch(:per_page, DEFAULT_PER_PAGE).to_i.clamp(1, MAX_PER_PAGE)
     total = scope.count
@@ -27,13 +21,9 @@ class ProductsController < ApplicationController
 
   # Nomi di tutte le categorie (tabella categories), per il menu a tendina del filtro.
   def categories
-<<<<<<< HEAD
-    # .active e' uno scope definito nel model Product che filtra solo i prodotti attivi
+    # .alphabetical e' uno scope definito nel model Category che ordina per nome
     # .pluck estrae una colonna come array invece che come array di oggetti ActiveRecord
-    render json: { categories: Product.active.where.not(category: [nil, ""]).distinct.order(:category).pluck(:category) }
-=======
     render json: { categories: Category.alphabetical.pluck(:name) }
->>>>>>> b75bc72 (feat: categorie come tabella a sé (products.category_id), CRUD admin e menu filtri dalla tabella)
   end
 
   def show
