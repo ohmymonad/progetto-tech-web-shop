@@ -43,12 +43,14 @@ catalog = {
   ]
 }
 
+Category.default
+
 catalog.each do |category, products|
   products.each_with_index do |(name, description, price), index|
     Product.find_or_create_by!(name: name) do |product|
       product.description = description
       product.price = price
-      product.category = category
+      product.category = Category.find_or_create_by!(name: category)
       product.stock = 10 + index * 5
       product.active = true
     end

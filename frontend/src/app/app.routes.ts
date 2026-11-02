@@ -62,6 +62,10 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/admin/admin-product-form').then((m) => m.AdminProductFormPage),
       },
       {
+        path: 'categories',
+        loadComponent: () => import('./pages/admin/admin-categories').then((m) => m.AdminCategoriesPage),
+      },
+      {
         path: 'users',
         loadComponent: () => import('./pages/admin/admin-users').then((m) => m.AdminUsersPage),
       },

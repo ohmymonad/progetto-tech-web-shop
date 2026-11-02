@@ -16,11 +16,22 @@ export interface Product {
   description: string | null;
   price: string;
   stock: number;
-  category: string | null;
+  category_id: number;
+  category: string;
   active: boolean;
 }
+
 //interfaccia per la query dei prodotti, usata in ProductService.list()
 //metadati di paginazione ritornati da API
+
+export interface Category {
+  id: number;
+  name: string;
+  default: boolean;
+  products_count: number;
+}
+
+
 export interface PageMeta {
   page: number;
   per_page: number;

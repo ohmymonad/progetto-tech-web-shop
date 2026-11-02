@@ -3,6 +3,7 @@ import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 
 import { errorMessage } from '../../core/http-error';
+import { Category } from '../../core/models';
 import { AdminService } from '../../services/admin.service';
 
 /** Creazione (`/admin/products/new`) e modifica (`/admin/products/:id/edit`) di un prodotto. */
@@ -42,7 +43,11 @@ import { AdminService } from '../../services/admin.service';
           </p>
           <p>
             <label for="category">Categoria</label><br />
-            <input id="category" formControlName="category" />
+            <select id="category" formControlName="category_id">
+              @for (c of categories(); track c.id) {
+                <option [ngValue]="c.id">{{ c.name }}</option>
+              }
+            </select>
           </p>
           <p>
             <label><input type="checkbox" formControlName="active" /> Attivo (visibile nel catalogo)</label>
@@ -63,6 +68,7 @@ export class AdminProductFormPage implements OnInit {
   /** Parametro di rotta `:id`, assente in creazione. */
   readonly id = input<string>();
 
+  protected readonly categories = signal<Category[]>([]);
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);
   protected readonly error = signal<string | null>(null);
@@ -71,11 +77,22 @@ export class AdminProductFormPage implements OnInit {
     description: [''],
     price: [0, [Validators.required, Validators.min(0.01)]],
     stock: [0, [Validators.required, Validators.min(0), Validators.pattern(/^\d+$/)]],
-    category: [''],
+    category_id: [0, Validators.min(1)],
     active: [true],
   });
 
   ngOnInit(): void {
+    this.admin.categories().subscribe({
+      next: (categories) => {
+        this.categories.set(categories);
+        // In creazione si parte da "non-categorized".
+        if (!this.id()) {
+          this.form.controls.category_id.setValue(categories.find((c) => c.default)?.id ?? 0);
+        }
+      },
+      error: (err) => this.error.set(errorMessage(err)),
+    });
+
     const id = this.id();
     if (!id) return;
 
@@ -87,7 +104,7 @@ export class AdminProductFormPage implements OnInit {
           description: p.description ?? '',
           price: Number(p.price),
           stock: p.stock,
-          category: p.category ?? '',
+          category_id: p.category_id,
           active: p.active,
         });
         this.loading.set(false);

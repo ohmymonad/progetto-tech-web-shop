@@ -4,7 +4,7 @@ FactoryBot.define do
     description { "Descrizione di prova" }
     price { 10.00 }
     stock { 5 }
-    category { "casa" }
+    association :category, name: "casa"
     active { true }
   end
 end
