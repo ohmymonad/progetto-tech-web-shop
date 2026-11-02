@@ -85,4 +85,25 @@ describe('CheckoutPage', () => {
 
     expect(el.textContent).toContain('Ordine #43 confermato');
   });
+
+  it('"Simula ordine fallito" usa /orders/fail e mostra l’errore', async () => {
+    const fixture = await render();
+    const el = fixture.nativeElement as HTMLElement;
+
+    fillAndSubmit(el);
+    http.expectOne(`${API}/orders`).flush({ error: 'x' }, { status: 422, statusText: 'Unprocessable' });
+    await fixture.whenStable();
+    const retry0 = [...el.querySelectorAll('button')].find((b) => b.textContent?.includes('Riprova'))!;
+    expect(retry0).toBeTruthy();
+
+    const fail = [...el.querySelectorAll('button')].find((b) => b.textContent?.includes('Simula ordine fallito'))!;
+    fail.click();
+    await fixture.whenStable();
+    expect(el.textContent).toContain('Loading');
+
+    http.expectOne(`${API}/orders/fail`).flush(
+      { error: 'errore - ordine non andato a buon fine' }, { status: 422, statusText: 'Unprocessable' });
+    await fixture.whenStable();
+    expect(el.querySelector('[role=alert]')!.textContent).toContain('errore - ordine non andato a buon fine');
+  });
 });

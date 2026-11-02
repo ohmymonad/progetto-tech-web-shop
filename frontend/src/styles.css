@@ -161,6 +161,7 @@ tbody tr:hover { background: #fafafa; }
 p.error[role='alert'], p.success[role='status'] {
   padding: 0.7rem 1rem; border-radius: var(--radius); border: 1px solid currentColor; background: #fff;
 }
+p.loading { padding: 0.7rem 1rem; border-radius: var(--radius); border: 1px dashed var(--muted); background: #fff; }
 .empty { text-align: center; padding: 3rem 1rem; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); color: var(--muted); }
 
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

@@ -33,4 +33,14 @@ describe('OrderService', () => {
     expect(req.request.body).toEqual({ order: customer });
     req.flush({ order: { id: 1 } });
   });
+
+  it('createFailing fa POST su /orders/fail con i dati cliente annidati', () => {
+    const customer = { full_name: 'A', email: 'a@b.it', address: 'x', city: 'y', postal_code: '00100' };
+    service.createFailing(customer).subscribe({ error: () => {} });
+
+    const req = http.expectOne('http://localhost:3000/orders/fail');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ order: customer });
+    req.flush({ error: 'errore - ordine non andato a buon fine' }, { status: 422, statusText: 'Unprocessable' });
+  });
 });

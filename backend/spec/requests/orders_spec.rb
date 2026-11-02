@@ -8,6 +8,24 @@ RSpec.describe "Ordini", type: :request do
       city: "Milano", postal_code: "20100" }
   end
 
+  # niente attesa reale di 5s nei test
+  before { allow_any_instance_of(OrdersController).to receive(:sleep) }
+
+  describe "POST /orders/fail" do
+    def send_request(h) = post("/orders/fail", params: { order: customer }, headers: h, as: :json)
+    it_behaves_like "richiede autenticazione"
+
+    it "risponde sempre 422 con il messaggio fisso, senza creare ordini né toccare il carrello" do
+      cart = create(:cart, user: user)
+      create(:cart_item, cart: cart, product: create(:product), quantity: 1, unit_price: 10)
+
+      expect { send_request(headers) }.not_to change(Order, :count)
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json["error"]).to eq("errore - ordine non andato a buon fine")
+      expect(user.reload.cart.cart_items.count).to eq(1)
+    end
+  end
+
   describe "POST /orders" do
     def send_request(h) = post("/orders", params: { order: customer }, headers: h, as: :json)
     it_behaves_like "richiede autenticazione"
