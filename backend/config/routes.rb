@@ -14,6 +14,12 @@ Rails.application.routes.draw do
   # altrimenti restituisce un errore 401 Unauthorized.(per esempio se il token è scaduto o non valido)
   get "auth/me", to: "auth/me#show"
 
+  ## ----
+  ## ricordiamo sempre per la resources sintax https://guides.rubyonrails.org/routing.html - sezione 2.2 CRUD, Verbs, Actions
+  ## ----
+
+
+  #endpoint prodotti e categorie
   resources :products, only: %i[index show] do
     get :categories, on: :collection
   end

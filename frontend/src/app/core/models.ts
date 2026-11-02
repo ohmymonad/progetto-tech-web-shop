@@ -9,6 +9,7 @@ export interface User {
   created_at: string;
 }
 
+//interfaccia per la query dei prodotti, usata in ProductService.list()
 export interface Product {
   id: number;
   name: string;
@@ -18,7 +19,8 @@ export interface Product {
   category: string | null;
   active: boolean;
 }
-
+//interfaccia per la query dei prodotti, usata in ProductService.list()
+//metadati di paginazione ritornati da API
 export interface PageMeta {
   page: number;
   per_page: number;

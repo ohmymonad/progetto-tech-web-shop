@@ -5,13 +5,15 @@ import { Observable, map } from 'rxjs';
 import { API_URL } from '../core/api.config';
 import { PageMeta, Product } from '../core/models';
 
+// elementi della query string in URL per filtrare i prodotti
 export interface ProductQuery {
   q?: string;
   tag?: string;
   page?: number;
   per_page?: number;
 }
-
+//rappresenta in unica struttura dati tutti i dati che 
+//servono a mostrare una pagina di prodotti
 export interface ProductPage {
   products: Product[];
   meta: PageMeta;
@@ -29,7 +31,7 @@ export class ProductService {
     }
     return this.http.get<ProductPage>(`${this.apiUrl}/products`, { params });
   }
-
+  // endpoint per ottenere la lista delle categorie distinte dei prodotti attivi
   categories(): Observable<string[]> {
     return this.http.get<{ categories: string[] }>(`${this.apiUrl}/products/categories`).pipe(map((body) => body.categories));
   }

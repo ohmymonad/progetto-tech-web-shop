@@ -1,3 +1,4 @@
+#serializer per i prodotti, usato in ProductsController#index e ProductsController#show
 class ProductSerializer
   def self.call(product)
     {

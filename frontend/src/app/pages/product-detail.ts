@@ -18,6 +18,7 @@ import { AddToCartButton } from './add-to-cart';
       <p class="error" role="alert">{{ error() }} <button type="button" (click)="load()">Riprova</button></p>
     } @else if (product(); as p) {
       <div class="product-layout">
+        <!-- colore del thumb basato sull'id del prodotto, per avere un colore diverso per ogni prodotto -->
         <div class="thumb" [style.--hue]="(p.id * 47) % 360" aria-hidden="true">{{ p.name.charAt(0).toUpperCase() }}</div>
         <section>
           @if (p.category) { <span class="category">{{ p.category }}</span> }
